@@ -47,7 +47,7 @@ void initialiseEmptyStack(DeckStack *stack, int numberOfDecks) {
  */
 void addCardToStack(DeckStack *stack, Card card) {
     stack->cardsLeft++;
-    realloc(stack->cardsInStack, stack->cardsLeft * sizeof(Card));
+    stack->cardsInStack = realloc(stack->cardsInStack, stack->cardsLeft * sizeof(Card));
 
     stack->cardsInStack[stack->cardsLeft - 1].cardSuit = card.cardSuit;
     stack->cardsInStack[stack->cardsLeft - 1].cardID = card.cardID;

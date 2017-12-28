@@ -101,13 +101,17 @@ void removeCardFromPlayersHand(Player *player, int position) {
  * @param player        The player
  */
 void listCardsOfPlayer(Player player) {
-    for (int i = 0; i < player.cardsInHand; i++) {
-        char suit[12] = "";
-        char cardName[12] = "";
+    if (player.cardsInHand > 0) {
+        for (int i = 0; i < player.cardsInHand; i++) {
+            char suit[12] = "";
+            char cardName[12] = "";
 
-        getCardSuitName(suit, player.cardsDealt[i]);
-        getCardName(cardName, player.cardsDealt[i]);
+            getCardSuitName(suit, player.cardsDealt[i]);
+            getCardName(cardName, player.cardsDealt[i]);
 
-        printf("Player \"%s\" has %s of %s \n", player.playerName, cardName, suit);
+            printf("Player \"%s\" has %s of %s \n", player.playerName, cardName, suit);
+        }
+    } else {
+        printf("Player \"%s\" has no cards \n", player.playerName);
     }
 }
