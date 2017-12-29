@@ -4,8 +4,10 @@
 
 #include "../cardAPI/api.h"
 
+#define DECKSUSED 1
+
 typedef struct blackJackPlayer {
     Player player;
-    int scoreMax;
-    int scoreMin;
+    int differentScores;
+    int *scores;
 } BlackJackPlayer;

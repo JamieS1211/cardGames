@@ -24,3 +24,9 @@ void getCardName(char *cardName, Card card);
  * @return              Card that was dealt to player
  */
 Card dealCard(DeckStack *stack, Player *player);
+
+/**
+ * A function to request user input for a specific card
+ * @return              The card the user specified
+ */
+Card getCardDealt();
