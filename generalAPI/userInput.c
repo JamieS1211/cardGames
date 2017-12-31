@@ -6,6 +6,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+/**
+ * A function to safely get integer user input
+ * @return              Value user inputted
+ */
 long getIntegerUserInput() {
 
     while (1) {

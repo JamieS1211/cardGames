@@ -12,15 +12,15 @@
 
 /**
  * A function to initialise a player with a given name
- * @param player        Pointer to the player
- * @param name          Name of the player
+ * @param playerPointer         Pointer to the player
+ * @param name                  Name of the player
  */
-void initialisePlayer(Player *player, char name[120]) {
-    strcpy(player->playerName, name);
+void initialisePlayer(Player *playerPointer, char name[120]) {
+    strcpy(playerPointer->playerName, name);
 
-    player->cardsInHand = 0;
+    playerPointer->cardsInHand = 0;
 
-    player->cardsDealt = NULL;
+    playerPointer->cardsDealt = NULL;
 }
 
 /**
@@ -29,38 +29,38 @@ void initialisePlayer(Player *player, char name[120]) {
  * @param position              Position of card
  * @return card                 Card at the given position
  */
-Card getCardFromPlayer(Player *player, int position) {
+Card getCardFromPlayer(Player *playerPointer, int position) {
     Card card;
-    card.cardSuit = player->cardsDealt[position].cardSuit;
-    card.cardID = player->cardsDealt[position].cardID;
+    card.cardSuit = playerPointer->cardsDealt[position].cardSuit;
+    card.cardID = playerPointer->cardsDealt[position].cardID;
 
     return card;
 }
 
 /**
  * A function to add a card to a players hand
- * @param player        Pointer to the player
- * @param card          Pointer to the card
+ * @param playerPointer         Pointer to the player
+ * @param card                  Pointer to the card
  */
-void addCardToPlayer(Player *player, Card card) {
-    player->cardsInHand++;
+void addCardToPlayer(Player *playerPointer, Card card) {
+    playerPointer->cardsInHand++;
 
-    player->cardsDealt = realloc(player->cardsDealt, player->cardsInHand * sizeof(Card));
+    playerPointer->cardsDealt = realloc(playerPointer->cardsDealt, playerPointer->cardsInHand * sizeof(Card));
 
-    player->cardsDealt[player->cardsInHand - 1].cardID = card.cardID;
-    player->cardsDealt[player->cardsInHand - 1].cardSuit = card.cardSuit;
+    playerPointer->cardsDealt[playerPointer->cardsInHand - 1].cardID = card.cardID;
+    playerPointer->cardsDealt[playerPointer->cardsInHand - 1].cardSuit = card.cardSuit;
 }
 
 /**
  * A function to return the position (first if multiple) of the given card in the given players hand
  *
- * @param player        Pointer to the player
- * @param card          Card
- * @return              Position of card, returns -1 if that card is not in players hand
+ * @param playerPointer         Pointer to the player
+ * @param card                  Card
+ * @return                      Position of card, returns -1 if that card is not in players hand
  */
-int findPositionOfPlayersCard(Player *player, Card card) {
-    for (int position = 0; position < player->cardsInHand; position++) {
-        if (player->cardsDealt[position].cardID == card.cardID && player->cardsDealt[position].cardSuit == card.cardSuit) {
+int findPositionOfPlayersCard(Player *playerPointer, Card card) {
+    for (int position = 0; position < playerPointer->cardsInHand; position++) {
+        if (playerPointer->cardsDealt[position].cardID == card.cardID && playerPointer->cardsDealt[position].cardSuit == card.cardSuit) {
             return position;
         }
     }
@@ -70,35 +70,35 @@ int findPositionOfPlayersCard(Player *player, Card card) {
 
 /**
 * A function to remove a card from a given position from the players hand
-* @param player                 Pointer to the player
-* @param position               Position of card
+* @param playerPointer              Pointer to the player
+* @param position                   Position of card
 */
-void removeCardFromPlayersHand(Player *player, int position) {
-    Card temp[player->cardsInHand];
+void removeCardFromPlayersHand(Player *playerPointer, int position) {
+    Card temp[playerPointer->cardsInHand];
 
-    for (int i = 0; i < player->cardsInHand; i++) {
-        temp[i].cardSuit = player->cardsDealt[i].cardSuit;
-        temp[i].cardID = player->cardsDealt[i].cardID;
+    for (int i = 0; i < playerPointer->cardsInHand; i++) {
+        temp[i].cardSuit = playerPointer->cardsDealt[i].cardSuit;
+        temp[i].cardID = playerPointer->cardsDealt[i].cardID;
     }
 
-    player->cardsInHand--;
+    playerPointer->cardsInHand--;
 
-    realloc(player->cardsDealt, player->cardsInHand * sizeof(Card));
+    realloc(playerPointer->cardsDealt, playerPointer->cardsInHand * sizeof(Card));
 
-    for (int i = 0; i <= player->cardsInHand; i++) {
+    for (int i = 0; i <= playerPointer->cardsInHand; i++) {
         if (i < position) {
-            player->cardsDealt[i].cardSuit = temp[i].cardSuit;
-            player->cardsDealt[i].cardID = temp[i].cardID;
+            playerPointer->cardsDealt[i].cardSuit = temp[i].cardSuit;
+            playerPointer->cardsDealt[i].cardID = temp[i].cardID;
         } else if (i > position) {
-            player->cardsDealt[i - 1].cardSuit = temp[i].cardSuit;
-            player->cardsDealt[i - 1].cardID = temp[i].cardID;
+            playerPointer->cardsDealt[i - 1].cardSuit = temp[i].cardSuit;
+            playerPointer->cardsDealt[i - 1].cardID = temp[i].cardID;
         }
     }
 }
 
 /**
  * A function to print out all the cards that a player has
- * @param player        The player
+ * @param player                       The player
  */
 void listCardsOfPlayer(Player player) {
     if (player.cardsInHand > 0) {

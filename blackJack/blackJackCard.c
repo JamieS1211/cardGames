@@ -13,7 +13,7 @@
 
 /**
  * A function to return the maximum value of a card
- * @param card
+ * @param card                              The card to get value of
  * @return
  */
 int getCardValue(Card card) {
@@ -30,21 +30,21 @@ int getCardValue(Card card) {
 
 /**
  * A function to deal a random card to a black jack player
- * @param stack             Pointer to the stack to deal from
- * @param usedStack         Pointer to the stack of used cards to shuffle from if needed
- * @param player            Pointer to the black jack player to deal to
+ * @param stackPointer                      Pointer to the stack to deal from
+ * @param usedStackPointer                  Pointer to the stack of used cards to shuffle from if needed
+ * @param blackJackPlayerPointer            Pointer to the black jack player to deal to
  */
-void dealBlackJack(DeckStack *stack, DeckStack *usedStack, BlackJackPlayer *player) {
+void dealBlackJack(DeckStack *stackPointer, DeckStack *usedStackPointer, BlackJackPlayer *blackJackPlayerPointer) {
 
-    if (stack->cardsLeft == 0) {
-        for (int i = 0; i < usedStack->cardsLeft; i++) {
-            addCardToStack(stack, getCardFromStack(usedStack, i));
-            removeCardFromStack(usedStack, i);
+    if (stackPointer->cardsLeft == 0) {
+        for (int i = 0; i < usedStackPointer->cardsLeft; i++) {
+            addCardToStack(stackPointer, getCardFromStack(usedStackPointer, i));
+            removeCardFromStack(usedStackPointer, i);
         }
     }
 
-    Card card = dealCard(stack, &player->player);
-    updatePlayersScore(player);
+    Card card = dealCard(stackPointer, &blackJackPlayerPointer->player);
+    updatePlayersScore(blackJackPlayerPointer);
 
     char suit[120] = "";
     char cardName[120] = "";
@@ -52,10 +52,10 @@ void dealBlackJack(DeckStack *stack, DeckStack *usedStack, BlackJackPlayer *play
     getCardSuitName(suit, card);
     getCardName(cardName, card);
 
-    printf("Dealt card %s of %s to \"%s\" giving score of:", cardName, suit, player->player.playerName);
+    printf("Dealt card %s of %s to \"%s\" giving score of:", cardName, suit, blackJackPlayerPointer->player.playerName);
 
-    for (int i = 0; i < player->differentScores; i++) {
-        printf("  %i  ", player->scores[i]);
+    for (int i = 0; i < blackJackPlayerPointer->differentScores; i++) {
+        printf("  %i  ", blackJackPlayerPointer->scores[i]);
     }
     printf("\n");
 
@@ -63,23 +63,23 @@ void dealBlackJack(DeckStack *stack, DeckStack *usedStack, BlackJackPlayer *play
 
 /**
  * A function to specified card to a black jack player
- * @param stack             Pointer to the stack to deal from
- * @param usedStack         Pointer to the stack of used cards to shuffle from if needed
- * @param player            Pointer to the black jack player to deal to
- * @param card              The card to give the player
+ * @param stackPointer                      Pointer to the stack to deal from
+ * @param usedStackPointer                  Pointer to the stack of used cards to shuffle from if needed
+ * @param blackJackPlayerPointer            Pointer to the black jack player to deal to
+ * @param card                              The card to give the player
  */
-void giveBlackJackPlayerCard(DeckStack *stack, DeckStack *usedStack, BlackJackPlayer *player, Card card) {
+void giveBlackJackPlayerCard(DeckStack *stackPointer, DeckStack *usedStackPointer, BlackJackPlayer *blackJackPlayerPointer, Card card) {
 
-    if (stack->cardsLeft == 0) {
-        for (int i = 0; i < usedStack->cardsLeft; i++) {
-            addCardToStack(stack, getCardFromStack(usedStack, i));
-            removeCardFromStack(usedStack, i);
+    if (stackPointer->cardsLeft == 0) {
+        for (int i = 0; i < usedStackPointer->cardsLeft; i++) {
+            addCardToStack(stackPointer, getCardFromStack(usedStackPointer, i));
+            removeCardFromStack(usedStackPointer, i);
         }
     }
 
-    removeCardFromStack(stack, findPositionOfStacksCard(stack, card));
-    addCardToPlayer(&player->player, card);
-    updatePlayersScore(player);
+    removeCardFromStack(stackPointer, findPositionOfStacksCard(stackPointer, card));
+    addCardToPlayer(&blackJackPlayerPointer->player, card);
+    updatePlayersScore(blackJackPlayerPointer);
 
     char suit[120] = "";
     char cardName[120] = "";
@@ -87,10 +87,10 @@ void giveBlackJackPlayerCard(DeckStack *stack, DeckStack *usedStack, BlackJackPl
     getCardSuitName(suit, card);
     getCardName(cardName, card);
 
-    printf("Dealt card %s of %s to \"%s\" giving score of:", cardName, suit, player->player.playerName);
+    printf("Dealt card %s of %s to \"%s\" giving score of:", cardName, suit, blackJackPlayerPointer->player.playerName);
 
-    for (int i = 0; i < player->differentScores; i++) {
-        printf("  %i  ", player->scores[i]);
+    for (int i = 0; i < blackJackPlayerPointer->differentScores; i++) {
+        printf("  %i  ", blackJackPlayerPointer->scores[i]);
     }
     printf("\n");
 }

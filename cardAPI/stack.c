@@ -9,20 +9,20 @@
 
 /**
  * A function to initialise a deck stack full of cards taking the pointer to the deck stack and number of decks
- * @param stack                 Pointer to stack
- * @param numberOfDecks         Number of decks in stack
+ * @param stackPointer                  Pointer to stack
+ * @param numberOfDecks                 Number of decks in stack
  */
-void initialiseFullStack(DeckStack *stack, int numberOfDecks) {
-    stack->numberOfDecks = numberOfDecks;
-    stack->cardsLeft = stack->numberOfDecks * NUMBER_OF_SUITS * NUMBER_OF_CARDS;
-    stack->cardsInStack = malloc(stack->cardsLeft * sizeof(Card));
+void initialiseFullStack(DeckStack *stackPointer, int numberOfDecks) {
+    stackPointer->numberOfDecks = numberOfDecks;
+    stackPointer->cardsLeft = stackPointer->numberOfDecks * NUMBER_OF_SUITS * NUMBER_OF_CARDS;
+    stackPointer->cardsInStack = malloc(stackPointer->cardsLeft * sizeof(Card));
 
     int count = 0;
     for (int deck = 0; deck < numberOfDecks; deck++) {
         for (int cardID = 1; cardID <= NUMBER_OF_CARDS; cardID++) {
             for (int suit = 0; suit < NUMBER_OF_SUITS; suit++) {
-                stack->cardsInStack[count].cardID = cardID;
-                stack->cardsInStack[count].cardSuit = suit;
+                stackPointer->cardsInStack[count].cardID = cardID;
+                stackPointer->cardsInStack[count].cardSuit = suit;
                 count++;
             }
         }
@@ -31,38 +31,38 @@ void initialiseFullStack(DeckStack *stack, int numberOfDecks) {
 
 /**
  * A function to initialise a deck stack with no cards taking the pointer to the deck stack and number of decks
- * @param stack                 Pointer to stack
- * @param numberOfDecks         Number of decks in stack
+ * @param stackPointer                  Pointer to stack
+ * @param numberOfDecks                 Number of decks in stack
  */
-void initialiseEmptyStack(DeckStack *stack, int numberOfDecks) {
-    stack->numberOfDecks = numberOfDecks;
-    stack->cardsLeft = 0;
-    stack->cardsInStack = NULL;
+void initialiseEmptyStack(DeckStack *stackPointer, int numberOfDecks) {
+    stackPointer->numberOfDecks = numberOfDecks;
+    stackPointer->cardsLeft = 0;
+    stackPointer->cardsInStack = NULL;
 }
 
 /**
  * A function to add a card to the deck stack
- * @param stack                 Pointer to stack
- * @param numberOfDecks         Number of decks in stack
+ * @param stackPointer                  Pointer to stack
+ * @param numberOfDecks                 Number of decks in stack
  */
-void addCardToStack(DeckStack *stack, Card card) {
-    stack->cardsLeft++;
-    stack->cardsInStack = realloc(stack->cardsInStack, stack->cardsLeft * sizeof(Card));
+void addCardToStack(DeckStack *stackPointer, Card card) {
+    stackPointer->cardsLeft++;
+    stackPointer->cardsInStack = realloc(stackPointer->cardsInStack, stackPointer->cardsLeft * sizeof(Card));
 
-    stack->cardsInStack[stack->cardsLeft - 1].cardSuit = card.cardSuit;
-    stack->cardsInStack[stack->cardsLeft - 1].cardID = card.cardID;
+    stackPointer->cardsInStack[stackPointer->cardsLeft - 1].cardSuit = card.cardSuit;
+    stackPointer->cardsInStack[stackPointer->cardsLeft - 1].cardID = card.cardID;
 }
 
 /**
  * A function to return the card at that position in the given stack
- * @param stack                 Pointer to the stack
- * @param position              Position of card
- * @return card                 Card at the given position
+ * @param stackPointer                  Pointer to the stack
+ * @param position                      Position of card
+ * @return card                         Card at the given position
  */
-Card getCardFromStack(DeckStack *stack, int position) {
+Card getCardFromStack(DeckStack *stackPointer, int position) {
     Card card;
-    card.cardSuit = stack->cardsInStack[position].cardSuit;
-    card.cardID = stack->cardsInStack[position ].cardID;
+    card.cardSuit = stackPointer->cardsInStack[position].cardSuit;
+    card.cardID = stackPointer->cardsInStack[position ].cardID;
 
     return card;
 }
@@ -70,13 +70,13 @@ Card getCardFromStack(DeckStack *stack, int position) {
 /**
  * A function to return the position (first if multiple) of the given card in the stack
  *
- * @param stack         Pointer to the stack
- * @param card          Card
- * @return              Position of card, returns -1 if that card is not in players hand
+ * @param stackPointer                  Pointer to the stack
+ * @param card                          Card
+ * @return                              Position of card, returns -1 if that card is not in players hand
  */
-int findPositionOfStacksCard(DeckStack *stack, Card card) {
-    for (int position = 0; position < stack->cardsLeft; position++) {
-        if (stack->cardsInStack[position].cardID == card.cardID && stack->cardsInStack[position].cardSuit == card.cardSuit) {
+int findPositionOfStacksCard(DeckStack *stackPointer, Card card) {
+    for (int position = 0; position < stackPointer->cardsLeft; position++) {
+        if (stackPointer->cardsInStack[position].cardID == card.cardID && stackPointer->cardsInStack[position].cardSuit == card.cardSuit) {
             return position;
         }
     }
@@ -86,28 +86,28 @@ int findPositionOfStacksCard(DeckStack *stack, Card card) {
 
 /**
  * A function to remove a card from a given position from the deck stack
- * @param deckStack              Pointer to the stack
- * @param position               Position of card
+ * @param stackPointer                  Pointer to the stack
+ * @param position                      Position of card
  */
-void removeCardFromStack(DeckStack *stack, int position) {
-    Card temp[stack->cardsLeft];
+void removeCardFromStack(DeckStack *stackPointer, int position) {
+    Card temp[stackPointer->cardsLeft];
 
-    for (int i = 0; i < stack->cardsLeft; i++) {
-        temp[i].cardSuit = stack->cardsInStack[i].cardSuit;
-        temp[i].cardID = stack->cardsInStack[i].cardID;
+    for (int i = 0; i < stackPointer->cardsLeft; i++) {
+        temp[i].cardSuit = stackPointer->cardsInStack[i].cardSuit;
+        temp[i].cardID = stackPointer->cardsInStack[i].cardID;
     }
 
-    stack->cardsLeft--;
+    stackPointer->cardsLeft--;
 
-    realloc(stack->cardsInStack, stack->cardsLeft * sizeof(Card));
+    realloc(stackPointer->cardsInStack, stackPointer->cardsLeft * sizeof(Card));
 
-    for (int i = 0; i <= stack->cardsLeft; i++) {
+    for (int i = 0; i <= stackPointer->cardsLeft; i++) {
         if (i < position) {
-            stack->cardsInStack[i].cardSuit = temp[i].cardSuit;
-            stack->cardsInStack[i].cardID = temp[i].cardID;
+            stackPointer->cardsInStack[i].cardSuit = temp[i].cardSuit;
+            stackPointer->cardsInStack[i].cardID = temp[i].cardID;
         } else if (i > position) {
-            stack->cardsInStack[i - 1].cardSuit = temp[i].cardSuit;
-            stack->cardsInStack[i - 1].cardID = temp[i].cardID;
+            stackPointer->cardsInStack[i - 1].cardSuit = temp[i].cardSuit;
+            stackPointer->cardsInStack[i - 1].cardID = temp[i].cardID;
         }
     }
 }

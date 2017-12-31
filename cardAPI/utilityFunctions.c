@@ -13,95 +13,95 @@
 
 /**
  * A function that updates a pointer to a character array and pointer to a card and updates the character array to be the suit of the card
- * @param cardName          Pointer to character array to store suit of card
- * @param card              The card
+ * @param suitPointer               Pointer to character array to store suit of card
+ * @param card                      The card
  */
-void getCardSuitName(char *suit, Card card) {
+void getCardSuitName(char *suitPointer, Card card) {
     switch (card.cardSuit) {
         case HEART:
-            strcpy(suit, "Hearts");
+            strcpy(suitPointer, "Hearts");
             break;
         case DIAMOND:
-            strcpy(suit, "Diamonds");
+            strcpy(suitPointer, "Diamonds");
             break;
         case CLUB:
-            strcpy(suit, "Clubs");
+            strcpy(suitPointer, "Clubs");
             break;
         case SPADE:
-            strcpy(suit, "Spades");
+            strcpy(suitPointer, "Spades");
             break;
         default:
-            strcpy(suit, "?");
+            strcpy(suitPointer, "?");
     }
 }
 
 /**
  * A function that updates a pointer to a character array and pointer to a card and updates the character array to be the name of the card
- * @param cardName          Pointer to character array to store name of card
- * @param card              The card
+ * @param cardNamePointer           Pointer to character array to store name of card
+ * @param card                      The card
  */
-void getCardName(char *cardName, Card card) {
+void getCardName(char *cardNamePointer, Card card) {
     switch (card.cardID) {
         case ACE:
-            strcpy(cardName, "Ace");
+            strcpy(cardNamePointer, "Ace");
             break;
         case TWO:
-            strcpy(cardName, "Two");
+            strcpy(cardNamePointer, "Two");
             break;
         case THREE:
-            strcpy(cardName, "Three");
+            strcpy(cardNamePointer, "Three");
             break;
         case FOUR:
-            strcpy(cardName, "Four");
+            strcpy(cardNamePointer, "Four");
             break;
         case FIVE:
-            strcpy(cardName, "Five");
+            strcpy(cardNamePointer, "Five");
             break;
         case SIX:
-            strcpy(cardName, "Six");
+            strcpy(cardNamePointer, "Six");
             break;
         case SEVEN:
-            strcpy(cardName, "Seven");
+            strcpy(cardNamePointer, "Seven");
             break;
         case EIGHT:
-            strcpy(cardName, "Eight");
+            strcpy(cardNamePointer, "Eight");
             break;
         case NINE:
-            strcpy(cardName, "Nine");
+            strcpy(cardNamePointer, "Nine");
             break;
         case TEN:
-            strcpy(cardName, "Ten");
+            strcpy(cardNamePointer, "Ten");
             break;
         case JACK:
-            strcpy(cardName, "Jack");
+            strcpy(cardNamePointer, "Jack");
             break;
         case QUEEN:
-            strcpy(cardName, "Queen");
+            strcpy(cardNamePointer, "Queen");
             break;
         case KING:
-            strcpy(cardName, "King");
+            strcpy(cardNamePointer, "King");
             break;
         default:
-            strcpy(cardName, "?");
+            strcpy(cardNamePointer, "?");
     }
 }
 
 /**
  * A function that takes a stack of cards and a player and deals a random card from that stack to the player returning the card that was dealt
  *
- * @param stack         Stack of cards to deal from
- * @param player        Player to deal card to
- * @return              Card that was dealt to player
+ * @param stackPointer          Stack of cards to deal from
+ * @param playerPointer         Player to deal card to
+ * @return                      Card that was dealt to player
  */
-Card dealCard(DeckStack *stack, Player *player) {
+Card dealCard(DeckStack *stackPointer, Player *playerPointer) {
     srand((unsigned int) time(NULL));
 
-    int cardPosition = rand() % stack->cardsLeft;
+    int cardPosition = rand() % stackPointer->cardsLeft;
 
-    Card card = getCardFromStack(stack, cardPosition);
-    removeCardFromStack(stack, cardPosition);
+    Card card = getCardFromStack(stackPointer, cardPosition);
+    removeCardFromStack(stackPointer, cardPosition);
 
-    addCardToPlayer(player, card);
+    addCardToPlayer(playerPointer, card);
 
     return card;
 }
