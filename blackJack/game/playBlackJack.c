@@ -28,7 +28,6 @@ void playBlackJack() {
     int on = 1;
 
     while (on) {
-
         dealBlackJack(&stack, &usedStack, &player);
         dealBlackJack(&stack, &usedStack, &player);
         dealBlackJack(&stack, &usedStack, &dealer);
@@ -36,15 +35,15 @@ void playBlackJack() {
         int playerBust = 0;
         int dealerBust = 0;
 
-        while (!playerBust) {
+        while (!playerBust && !doesPlayerHaveBlackJack(&player)) {
 
-            printf("You have a score of score of:", player.player.playerName);
-            for (int i = 0; i < player.differentScores; i++) {
-                printf("  %i  ", player.scores[i]);
+            printf("You have a score of score of: %i ", player.score);
+            if (player.isScoreSoft) {
+                printf("or %i", player.score - 10);
             }
             printf("\n");
 
-            calculateProbabilities(&stack, &player);
+            calculateProbabilities(&stack, &player, &dealer);
 
             printf("Would you like to hit or stand? \n"
                            "\t1: Hit \n"
@@ -82,15 +81,23 @@ void playBlackJack() {
             printf("DEALER WIN \n \n \n");
         } else {
 
-            printf("Player has a score of: %i \n", getPlayersBestScore(&player));
-            printf("Dealer has a score of: %i \n ", getPlayersBestScore(&dealer));
-
-            if (getPlayersBestScore(&player) > getPlayersBestScore(&dealer)) {
+            if (doesPlayerHaveBlackJack(&player) && doesPlayerHaveBlackJack(&dealer)) {
+                printf("\n \n \nDRAW \n \n \n");
+            } else if (doesPlayerHaveBlackJack(&player)) {
                 printf("\n \n \nPLAYER WIN \n \n \n");
-            } else if (getPlayersBestScore(&dealer) > getPlayersBestScore(&player)) {
+            } else if (doesPlayerHaveBlackJack(&dealer)) {
                 printf("\n \n \nDEALER WIN \n \n \n");
             } else {
-                printf("\n \n \nDRAW \n \n \n");
+                printf("Player has a score of: %i \n", getPlayersBestScore(&player));
+                printf("Dealer has a score of: %i \n ", getPlayersBestScore(&dealer));
+
+                if (getPlayersBestScore(&player) > getPlayersBestScore(&dealer)) {
+                    printf("\n \n \nPLAYER WIN \n \n \n");
+                } else if (getPlayersBestScore(&dealer) > getPlayersBestScore(&player)) {
+                    printf("\n \n \nDEALER WIN \n \n \n");
+                } else {
+                    printf("\n \n \nDRAW \n \n \n");
+                }
             }
         }
 

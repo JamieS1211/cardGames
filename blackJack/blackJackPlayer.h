@@ -33,3 +33,25 @@ void updatePlayersScore(BlackJackPlayer *blackJackPlayerPointer);
  * @return score                  The best score of the black jack player or lowest if bust
  */
 int getPlayersBestScore(BlackJackPlayer *blackJackPlayerPointer);
+
+/**
+ * A function to return if a black jack player has a blackjack
+ * @param blackJackPlayerPointer        Pointer to the black jack player
+ * @return                              If the player has a black jack
+ */
+int doesPlayerHaveBlackJack(BlackJackPlayer *blackJackPlayerPointer);
+
+/**
+ * A function to move a card from a deck stack to a players hand
+ * @param stackPointer                  Pointer to the stack
+ * @param cardPosition                  Position of the card in the stack to move
+ * @param blackJackPlayerPointer        Pointer to the black jack player
+ */
+void moveCardFromStackToBlackJackPlayer(DeckStack *stackPointer, int cardPosition, BlackJackPlayer *blackJackPlayerPointer);
+
+/**
+ * A function to move a card from a players hand to a deck stack
+ * @param stackPointer                  Pointer to the stack
+ * @param blackJackPlayerPointer        Pointer to the black jack player
+ */
+void moveLastCardFromBlackJackPlayerToStack(DeckStack *stackPointer, BlackJackPlayer *blackJackPlayerPointer);

@@ -8,6 +8,7 @@
 #include "../../cardAPI/utilityFunctions.h"
 #include "../blackJackCard.h"
 #include "../../generalAPI/userInput.h"
+#include "probabilityCalculator.h"
 
 void cardCountBlackJack() {
 
@@ -38,6 +39,7 @@ void cardCountBlackJack() {
         printf("Please enter the dealers first card \n");
         giveBlackJackPlayerCard(&stack, &usedStack, &dealer, getCardDealt());
 
+        calculateProbabilities(&stack, &player, &dealer);
 
         for (int i = player.player.cardsInHand; i > 0; i--) {
             addCardToStack(&usedStack, getCardFromPlayer(&player.player, 0));

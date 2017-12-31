@@ -12,7 +12,7 @@
 #include "blackJackPlayer.h"
 
 /**
- * A function to return the maximum value of a card
+ * A function to return the minimum value of a card
  * @param card                              The card to get value of
  * @return
  */
@@ -52,10 +52,10 @@ void dealBlackJack(DeckStack *stackPointer, DeckStack *usedStackPointer, BlackJa
     getCardSuitName(suit, card);
     getCardName(cardName, card);
 
-    printf("Dealt card %s of %s to \"%s\" giving score of:", cardName, suit, blackJackPlayerPointer->player.playerName);
+    printf("Dealt card %s of %s to \"%s\" giving score of: %i ", cardName, suit, blackJackPlayerPointer->player.playerName, blackJackPlayerPointer->score);
 
-    for (int i = 0; i < blackJackPlayerPointer->differentScores; i++) {
-        printf("  %i  ", blackJackPlayerPointer->scores[i]);
+    if (blackJackPlayerPointer->isScoreSoft) {
+        printf("or %i", blackJackPlayerPointer->score - 10);
     }
     printf("\n");
 
@@ -87,10 +87,10 @@ void giveBlackJackPlayerCard(DeckStack *stackPointer, DeckStack *usedStackPointe
     getCardSuitName(suit, card);
     getCardName(cardName, card);
 
-    printf("Dealt card %s of %s to \"%s\" giving score of:", cardName, suit, blackJackPlayerPointer->player.playerName);
+    printf("Dealt card %s of %s to \"%s\" giving score of: %i ", cardName, suit, blackJackPlayerPointer->player.playerName, blackJackPlayerPointer->score);
 
-    for (int i = 0; i < blackJackPlayerPointer->differentScores; i++) {
-        printf("  %i  ", blackJackPlayerPointer->scores[i]);
+    if (blackJackPlayerPointer->isScoreSoft) {
+        printf("or %i", blackJackPlayerPointer->score - 10);
     }
     printf("\n");
 }

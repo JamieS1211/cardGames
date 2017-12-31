@@ -8,6 +8,13 @@
 
 typedef struct blackJackPlayer {
     Player player;
-    int differentScores;
-    int *scores;
+    int isScoreSoft;
+    int score;
 } BlackJackPlayer;
+
+typedef struct probability {
+    int numberOfWaysToAchieveScore;
+    int numberOfWaysWithScoreToWin;
+    int numberOfWaysWithScoreToDraw;
+    int numberOfWaysWithScoreToLoose;
+} Probability;

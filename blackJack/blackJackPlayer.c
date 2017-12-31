@@ -9,6 +9,7 @@
 
 #include "../cardAPI/player.h"
 #include "blackJackCard.h"
+#include "../cardAPI/stack.h"
 
 /**
  * A function to initialise a black jack player with a given name
@@ -18,8 +19,8 @@
 void initialiseBlackJackPlayer(BlackJackPlayer *blackJackPlayerPointer, char name[120]) {
     initialisePlayer(&blackJackPlayerPointer->player, name);
 
-    blackJackPlayerPointer->scores = NULL;
-    blackJackPlayerPointer->differentScores = 1;
+    blackJackPlayerPointer->score = 0;
+    blackJackPlayerPointer->isScoreSoft = 0;
 }
 
 /**
@@ -35,20 +36,19 @@ void listCardsOfBlackJackPlayer(BlackJackPlayer *blackJackPlayerPointer) {
  * @param blackJackPlayerPointer        Pointer to the black jack player
  */
 void updatePlayersScore(BlackJackPlayer *blackJackPlayerPointer) {
-    int differentScores = 1;
-    int baseScore = 0;
+    blackJackPlayerPointer->score = 0;
+    int aceCount = 0;
 
     for (int i = 0; i < blackJackPlayerPointer->player.cardsInHand; i++) {
-        baseScore += getCardValue(blackJackPlayerPointer->player.cardsDealt[i]);
+        blackJackPlayerPointer->score += getCardValue(blackJackPlayerPointer->player.cardsDealt[i]);
         if (blackJackPlayerPointer->player.cardsDealt[i].cardID == ACE) {
-            differentScores++;
+            aceCount++;
         }
     }
 
-    blackJackPlayerPointer->differentScores = differentScores;
-    blackJackPlayerPointer->scores = realloc(blackJackPlayerPointer->scores, differentScores * sizeof(int));
-    for (int i = 0; i < differentScores; i++) {
-        blackJackPlayerPointer->scores[i] = baseScore + (10 * i);
+    if (aceCount > 0 && blackJackPlayerPointer->score + 10 <= 21) {
+        blackJackPlayerPointer->score += 10;
+        blackJackPlayerPointer->isScoreSoft = 1;
     }
 }
 
@@ -68,11 +68,37 @@ void removeCardFromBlackJackPlayersHand(BlackJackPlayer *blackJackPlayerPointer,
  * @return score                         The best score of the black jack player or lowest if bust
  */
 int getPlayersBestScore(BlackJackPlayer *blackJackPlayerPointer) {
-    for (int i = blackJackPlayerPointer->differentScores - 1; i >= 0; i--) {
-        if (blackJackPlayerPointer->scores[i] <= 21) {
-            return blackJackPlayerPointer->scores[i];
-        }
-    }
+    updatePlayersScore(blackJackPlayerPointer);
+    return blackJackPlayerPointer->score;
+}
 
-    return blackJackPlayerPointer->scores[0];
+/**
+ * A function to return if a black jack player has a blackjack
+ * @param blackJackPlayerPointer        Pointer to the black jack player
+ * @return                              If the player has a black jack
+ */
+int doesPlayerHaveBlackJack(BlackJackPlayer *blackJackPlayerPointer) {
+    return blackJackPlayerPointer->score == 21 && blackJackPlayerPointer->player.cardsInHand == 2;
+}
+
+/**
+ * A function to move a card from a deck stack to a players hand
+ * @param stackPointer                  Pointer to the stack
+ * @param cardPosition                  Position of the card in the stack to move
+ * @param blackJackPlayerPointer        Pointer to the black jack player
+ */
+void moveCardFromStackToBlackJackPlayer(DeckStack *stackPointer, int cardPosition, BlackJackPlayer *blackJackPlayerPointer) {
+    addCardToPlayer(&blackJackPlayerPointer->player, getCardFromStack(stackPointer, cardPosition));
+    removeCardFromStack(stackPointer, cardPosition);
+}
+
+/**
+ * A function to move a card from a players hand to a deck stack
+ * @param stackPointer                  Pointer to the stack
+ * @param blackJackPlayerPointer        Pointer to the black jack player
+ */
+void moveLastCardFromBlackJackPlayerToStack(DeckStack *stackPointer, BlackJackPlayer *blackJackPlayerPointer) {
+    int playersHandPosition = blackJackPlayerPointer->player.cardsInHand - 1;
+    addCardToStack(stackPointer, getCardFromPlayer(&blackJackPlayerPointer->player, playersHandPosition));
+    removeCardFromPlayersHand(&blackJackPlayerPointer->player, playersHandPosition);
 }
