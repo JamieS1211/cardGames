@@ -78,39 +78,28 @@ int doesPlayerHaveBlackJack(BlackJackPlayer *blackJackPlayerPointer) {
 
 /**
  * A function to move a card from a deck stack to a players hand
- * @param deckStackPointer              Pointer to the stack
- * @param cardPosition                  Position of the card in the stack to move
+ * @param simpleStackPointer            Pointer to the stack
+ * @param cardID                        Card in the stack to move
  * @param blackJackPlayerPointer        Pointer to the black jack player
  */
-void moveCardFromStackToBlackJackPlayer(DeckStack *deckStackPointer, int cardPosition, BlackJackPlayer *blackJackPlayerPointer) {
-    Card card = getCardFromDeckStack(deckStackPointer, cardPosition);
-    addCardToPlayer(&blackJackPlayerPointer->player, card);
-    removeCardFromDeckStack(deckStackPointer, cardPosition);
+void moveCardFromSimpleStackToBlackJackPlayer(SimpleStack *simpleStackPointer, int cardID, BlackJackPlayer *blackJackPlayerPointer) {
+    Card card;
+    card.cardID = cardID;
+    card.cardSuit = 0; //Place holder not used
 
-    /*
-    char name[120];
-    getCardName(name, card);
-    char suit[120];
-    getCardSuitName(suit, card);
-    printf("Moved card %s of %s from stack to player \n", name, suit);
-     */
+    addCardToPlayer(&blackJackPlayerPointer->player, card);
+    simpleStackPointer->cardsCountsInStack[cardID]--;
+    simpleStackPointer->cardsLeft--;
 }
 
 /**
  * A function to move a card from a players hand to a deck stack
- * @param deckStackPointer              Pointer to the stack
+ * @param simpleStackPointer            Pointer to the stack
  * @param blackJackPlayerPointer        Pointer to the black jack player
  */
-void moveLastCardFromBlackJackPlayerToStack(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer) {
+void moveLastCardFromBlackJackPlayerToSimpleStack(SimpleStack *simpleStackPointer, BlackJackPlayer *blackJackPlayerPointer) {
     Card card = getCardFromPlayer(&blackJackPlayerPointer->player, blackJackPlayerPointer->player.cardsInHand - 1);
-    addCardToDeckStack(deckStackPointer, card);
+    simpleStackPointer->cardsCountsInStack[card.cardID]++;
+    simpleStackPointer->cardsLeft++;
     removeCardFromPlayersHand(&blackJackPlayerPointer->player, blackJackPlayerPointer->player.cardsInHand - 1);
-
-    /*
-    char name[120];
-    getCardName(name, card);
-    char suit[120];
-    getCardSuitName(suit, card);
-    printf("Moved card %s of %s from player to stack \n", name, suit);
-     */
 }

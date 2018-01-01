@@ -5,7 +5,7 @@
 /**
  * A function to initialise a black jack player with a given name
  * @param blackJackPlayerPointer        Pointer to the black jack player
- * @param name                   Name of the black jack player
+ * @param name                          Name of the black jack player
  */
 void initialiseBlackJackPlayer(BlackJackPlayer *blackJackPlayerPointer, char name[120]);
 
@@ -16,17 +16,17 @@ void initialiseBlackJackPlayer(BlackJackPlayer *blackJackPlayerPointer, char nam
 void listCardsOfBlackJackPlayer(BlackJackPlayer *blackJackPlayerPointer);
 
 /**
- * A function to remove a card from a black jack player
- * @param blackJackPlayerPointer       Pointer to the black jack player
- * @param position              Position
- */
-void removeCardFromBlackJackPlayersHand(BlackJackPlayer *blackJackPlayerPointer, int position);
-
-/**
  * A function to read all cards a black jack player has and store all the possible scores
  * @param blackJackPlayerPointer        Pointer to the black jack player
  */
 void updatePlayersScore(BlackJackPlayer *blackJackPlayerPointer);
+
+/**
+ * A function to remove a card from a black jack player
+ * @param blackJackPlayerPointer        Pointer to the black jack player
+ * @param position                      Position
+ */
+void removeCardFromBlackJackPlayersHand(BlackJackPlayer *blackJackPlayerPointer, int position);
 
 /**
  * A function to return if a black jack player has a blackjack
@@ -37,15 +37,15 @@ int doesPlayerHaveBlackJack(BlackJackPlayer *blackJackPlayerPointer);
 
 /**
  * A function to move a card from a deck stack to a players hand
- * @param deckStackPointer                  Pointer to the stack
- * @param cardPosition                  Position of the card in the stack to move
+ * @param simpleStackPointer            Pointer to the stack
+ * @param cardID                  Position of the card in the stack to move
  * @param blackJackPlayerPointer        Pointer to the black jack player
  */
-void moveCardFromStackToBlackJackPlayer(DeckStack *deckStackPointer, int cardPosition, BlackJackPlayer *blackJackPlayerPointer);
+void moveCardFromSimpleStackToBlackJackPlayer(SimpleStack *simpleStackPointer, int cardID, BlackJackPlayer *blackJackPlayerPointer);
 
 /**
  * A function to move a card from a players hand to a deck stack
- * @param deckStackPointer                  Pointer to the stack
+ * @param simpleStackPointer            Pointer to the stack
  * @param blackJackPlayerPointer        Pointer to the black jack player
  */
-void moveLastCardFromBlackJackPlayerToStack(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer);
+void moveLastCardFromBlackJackPlayerToSimpleStack(SimpleStack *simpleStackPointer, BlackJackPlayer *blackJackPlayerPointer);

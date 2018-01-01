@@ -2,7 +2,6 @@
 // Created by Jamie on 01/01/2018.
 //
 
-#include <stdlib.h>
 #include "api.h"
 #include "deckStack.h"
 
@@ -12,9 +11,11 @@
  * @param deckStackPointer              Pointer to deck stack
  */
 void initialiseSimpleStackFromDeckStack(SimpleStack *simpleStackPointer, DeckStack *deckStackPointer) {
-    simpleStackPointer->cardsCountsInStack = malloc((NUMBER_OF_CARDS + 1) * sizeof(int));
-
     simpleStackPointer->cardsLeft = deckStackPointer->cardsLeft;
+
+    for (int i = 0; i <= NUMBER_OF_CARDS; i++) {
+        simpleStackPointer->cardsCountsInStack[i] = 0;
+    }
 
     for (int i = 0; i < deckStackPointer->cardsLeft; i++) {
         simpleStackPointer->cardsCountsInStack[getCardFromDeckStack(deckStackPointer, i).cardID]++;
