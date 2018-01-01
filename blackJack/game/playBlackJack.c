@@ -7,16 +7,16 @@
 
 #include "../../generalAPI/userInput.h"
 
-#include "../../cardAPI/stack.h"
+#include "../../cardAPI/deckStack.h"
 #include "../../cardAPI/player.h"
 
 void playBlackJack() {
 
-    DeckStack stack;
-    initialiseFullStack(&stack, DECKSUSED);
+    DeckStack deckStack;
+    initialiseFullDeckStack(&deckStack, DECKSUSED);
 
-    DeckStack usedStack;
-    initialiseEmptyStack(&usedStack, DECKSUSED);
+    DeckStack usedDeckStack;
+    initialiseEmptyDeckStack(&usedDeckStack, DECKSUSED);
 
 
     BlackJackPlayer player;
@@ -28,9 +28,9 @@ void playBlackJack() {
     int on = 1;
 
     while (on) {
-        dealBlackJack(&stack, &usedStack, &player);
-        dealBlackJack(&stack, &usedStack, &player);
-        dealBlackJack(&stack, &usedStack, &dealer);
+        dealBlackJack(&deckStack, &usedDeckStack, &player);
+        dealBlackJack(&deckStack, &usedDeckStack, &player);
+        dealBlackJack(&deckStack, &usedDeckStack, &dealer);
 
         int playerBust = 0;
         int dealerBust = 0;
@@ -43,7 +43,7 @@ void playBlackJack() {
             }
             printf("\n");
 
-            calculateProbabilities(&stack, &player, &dealer);
+            calculateProbabilities(&deckStack, &player, &dealer);
 
             printf("Would you like to hit or stand? \n"
                            "\t1: Hit \n"
@@ -52,8 +52,8 @@ void playBlackJack() {
             long option = getIntegerUserInput();
 
             if (option == 1) {
-                dealBlackJack(&stack, &usedStack, &player);
-                if (getPlayersBestScore(&player) > 21) {
+                dealBlackJack(&deckStack, &usedDeckStack, &player);
+                if (player.score > 21) {
                     playerBust = 1;
                     printf("\n \n \nPLAYER HAS GONE BUST \n");
                 }
@@ -65,11 +65,11 @@ void playBlackJack() {
         }
 
         if (!playerBust) {
-            while (getPlayersBestScore(&dealer) < 17) {
-                dealBlackJack(&stack, &usedStack, &dealer);
+            while (dealer.score < 17) {
+                dealBlackJack(&deckStack, &usedDeckStack, &dealer);
             }
 
-            if (getPlayersBestScore(&dealer) > 21) {
+            if (dealer.score > 21) {
                 dealerBust = 1;
                 printf("\n \n \nDEALER HAS GONE BUST \n");
             }
@@ -88,12 +88,12 @@ void playBlackJack() {
             } else if (doesPlayerHaveBlackJack(&dealer)) {
                 printf("\n \n \nDEALER WIN \n \n \n");
             } else {
-                printf("Player has a score of: %i \n", getPlayersBestScore(&player));
-                printf("Dealer has a score of: %i \n ", getPlayersBestScore(&dealer));
+                printf("Player has a score of: %i \n", player.score);
+                printf("Dealer has a score of: %i \n ", dealer.score);
 
-                if (getPlayersBestScore(&player) > getPlayersBestScore(&dealer)) {
+                if (player.score > dealer.score) {
                     printf("\n \n \nPLAYER WIN \n \n \n");
-                } else if (getPlayersBestScore(&dealer) > getPlayersBestScore(&player)) {
+                } else if (dealer.score > player.score) {
                     printf("\n \n \nDEALER WIN \n \n \n");
                 } else {
                     printf("\n \n \nDRAW \n \n \n");
@@ -102,12 +102,12 @@ void playBlackJack() {
         }
 
         for (int i = player.player.cardsInHand; i > 0; i--) {
-            addCardToStack(&usedStack, getCardFromPlayer(&player.player, 0));
+            addCardToDeckStack(&usedDeckStack, getCardFromPlayer(&player.player, 0));
             removeCardFromBlackJackPlayersHand(&player, 0);
         }
 
         for (int i = dealer.player.cardsInHand; i > 0; i--) {
-            addCardToStack(&usedStack, getCardFromPlayer(&dealer.player, 0));
+            addCardToDeckStack(&usedDeckStack, getCardFromPlayer(&dealer.player, 0));
             removeCardFromBlackJackPlayersHand(&dealer, 0);
         }
 
@@ -129,6 +129,4 @@ void playBlackJack() {
             }
         }
     }
-
-    return;
 }

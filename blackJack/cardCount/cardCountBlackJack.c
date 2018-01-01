@@ -3,7 +3,7 @@
 #include "../blackJack.h"
 #include "../blackJackPlayer.h"
 
-#include "../../cardAPI/stack.h"
+#include "../../cardAPI/deckStack.h"
 #include "../../cardAPI/player.h"
 #include "../../cardAPI/utilityFunctions.h"
 #include "../blackJackCard.h"
@@ -12,11 +12,11 @@
 
 void cardCountBlackJack() {
 
-    DeckStack stack;
-    initialiseFullStack(&stack, 1);
+    DeckStack deckStack;
+    initialiseFullDeckStack(&deckStack, 1);
 
-    DeckStack usedStack;
-    initialiseEmptyStack(&usedStack, 1);
+    DeckStack usedDeckStack;
+    initialiseEmptyDeckStack(&usedDeckStack, 1);
 
 
     BlackJackPlayer player;
@@ -31,26 +31,27 @@ void cardCountBlackJack() {
 
 
         printf("Please enter the players first card \n");
-        giveBlackJackPlayerCard(&stack, &usedStack, &player, getCardDealt());
+        giveBlackJackPlayerCard(&deckStack, &usedDeckStack, &player, getCardDealt());
 
         printf("Please enter the players second card \n");
-        giveBlackJackPlayerCard(&stack, &usedStack, &player, getCardDealt());
+        giveBlackJackPlayerCard(&deckStack, &usedDeckStack, &player, getCardDealt());
 
         printf("Please enter the dealers first card \n");
-        giveBlackJackPlayerCard(&stack, &usedStack, &dealer, getCardDealt());
+        giveBlackJackPlayerCard(&deckStack, &usedDeckStack, &dealer, getCardDealt());
 
-        calculateProbabilities(&stack, &player, &dealer);
+        calculateProbabilities(&deckStack, &player, &dealer);
 
         for (int i = player.player.cardsInHand; i > 0; i--) {
-            addCardToStack(&usedStack, getCardFromPlayer(&player.player, 0));
+            addCardToDeckStack(&usedDeckStack, getCardFromPlayer(&player.player, 0));
             removeCardFromBlackJackPlayersHand(&player, 0);
         }
 
         for (int i = dealer.player.cardsInHand; i > 0; i--) {
-            addCardToStack(&usedStack, getCardFromPlayer(&dealer.player, 0));
+            addCardToDeckStack(&usedDeckStack, getCardFromPlayer(&dealer.player, 0));
             removeCardFromBlackJackPlayersHand(&dealer, 0);
         }
 
+        /*
         while (1) {
             printf("Calculate next hand? \n"
                            "\t1: Yes \n"
@@ -68,7 +69,6 @@ void cardCountBlackJack() {
                 printf("What was entered was not a valid option, please try again. \n");
             }
         }
+         */
     }
-
-    return;
 }

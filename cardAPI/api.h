@@ -39,6 +39,11 @@ typedef struct deckStack {
     Card *cardsInStack;
 } DeckStack;
 
+typedef struct simpleStack {
+    int cardsLeft;
+    int cardsCountsInStack[NUMBER_OF_CARDS + 1];
+} SimpleStack;
+
 typedef struct player {
     char playerName[120];
     int cardsInHand;

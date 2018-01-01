@@ -1,15 +1,8 @@
 //
 // Created by Jamie on 28/12/2017.
 //
+void calculateChanceOfWin(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer, Probability *probabilityNodePointer);
 
-void printProbabilities(Probability **probabilityTree);
+void calculatePlayerHitScores(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer, Probability probabilityTree[3][23], int currentLayer);
 
-// A function that takes a player and dealer state and updates a probability tree with chance player wins / losses / draws with dealer provided player stands at this point
-
-void calculateChanceOfWin(DeckStack *stackPointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer, Probability *probabilityNodePointer);
-
-// A recursive function that builds up a pobability tree showing probabilities of outcomes
-
-void calculatePlayerHitScores(DeckStack *stackPointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer, Probability **probabilityTree, int currentLayer);
-
-void calculateProbabilities(DeckStack *stackPointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer);
+void calculateProbabilities(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer);

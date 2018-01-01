@@ -7,7 +7,7 @@
 #include <time.h>
 #include <stdio.h>
 #include "api.h"
-#include "stack.h"
+#include "deckStack.h"
 #include "player.h"
 #include "../generalAPI/userInput.h"
 
@@ -98,8 +98,8 @@ Card dealCard(DeckStack *stackPointer, Player *playerPointer) {
 
     int cardPosition = rand() % stackPointer->cardsLeft;
 
-    Card card = getCardFromStack(stackPointer, cardPosition);
-    removeCardFromStack(stackPointer, cardPosition);
+    Card card = getCardFromDeckStack(stackPointer, cardPosition);
+    removeCardFromDeckStack(stackPointer, cardPosition);
 
     addCardToPlayer(playerPointer, card);
 

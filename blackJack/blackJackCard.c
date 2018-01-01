@@ -6,7 +6,7 @@
 
 #include "blackJack.h"
 
-#include "../cardAPI/stack.h"
+#include "../cardAPI/deckStack.h"
 #include "../cardAPI/utilityFunctions.h"
 #include "../cardAPI/player.h"
 #include "blackJackPlayer.h"
@@ -30,20 +30,20 @@ int getCardValue(Card card) {
 
 /**
  * A function to deal a random card to a black jack player
- * @param stackPointer                      Pointer to the stack to deal from
- * @param usedStackPointer                  Pointer to the stack of used cards to shuffle from if needed
+ * @param deckStackPointer                  Pointer to the deck stack to deal from
+ * @param usedDeckStackPointer              Pointer to the deck stack of used cards to shuffle from if needed
  * @param blackJackPlayerPointer            Pointer to the black jack player to deal to
  */
-void dealBlackJack(DeckStack *stackPointer, DeckStack *usedStackPointer, BlackJackPlayer *blackJackPlayerPointer) {
+void dealBlackJack(DeckStack *deckStackPointer, DeckStack *usedDeckStackPointer, BlackJackPlayer *blackJackPlayerPointer) {
 
-    if (stackPointer->cardsLeft == 0) {
-        for (int i = 0; i < usedStackPointer->cardsLeft; i++) {
-            addCardToStack(stackPointer, getCardFromStack(usedStackPointer, i));
-            removeCardFromStack(usedStackPointer, i);
+    if (deckStackPointer->cardsLeft == 0) {
+        for (int i = 0; i < usedDeckStackPointer->cardsLeft; i++) {
+            addCardToDeckStack(deckStackPointer, getCardFromDeckStack(usedDeckStackPointer, i));
+            removeCardFromDeckStack(usedDeckStackPointer, i);
         }
     }
 
-    Card card = dealCard(stackPointer, &blackJackPlayerPointer->player);
+    Card card = dealCard(deckStackPointer, &blackJackPlayerPointer->player);
     updatePlayersScore(blackJackPlayerPointer);
 
     char suit[120] = "";
@@ -63,21 +63,21 @@ void dealBlackJack(DeckStack *stackPointer, DeckStack *usedStackPointer, BlackJa
 
 /**
  * A function to specified card to a black jack player
- * @param stackPointer                      Pointer to the stack to deal from
- * @param usedStackPointer                  Pointer to the stack of used cards to shuffle from if needed
+ * @param deckStackPointer                  Pointer to the stack to deal from
+ * @param usedDeckStackPointer              Pointer to the stack of used cards to shuffle from if needed
  * @param blackJackPlayerPointer            Pointer to the black jack player to deal to
  * @param card                              The card to give the player
  */
-void giveBlackJackPlayerCard(DeckStack *stackPointer, DeckStack *usedStackPointer, BlackJackPlayer *blackJackPlayerPointer, Card card) {
+void giveBlackJackPlayerCard(DeckStack *deckStackPointer, DeckStack *usedDeckStackPointer, BlackJackPlayer *blackJackPlayerPointer, Card card) {
 
-    if (stackPointer->cardsLeft == 0) {
-        for (int i = 0; i < usedStackPointer->cardsLeft; i++) {
-            addCardToStack(stackPointer, getCardFromStack(usedStackPointer, i));
-            removeCardFromStack(usedStackPointer, i);
+    if (deckStackPointer->cardsLeft == 0) {
+        for (int i = 0; i < usedDeckStackPointer->cardsLeft; i++) {
+            addCardToDeckStack(deckStackPointer, getCardFromDeckStack(usedDeckStackPointer, i));
+            removeCardFromDeckStack(usedDeckStackPointer, i);
         }
     }
 
-    removeCardFromStack(stackPointer, findPositionOfStacksCard(stackPointer, card));
+    removeCardFromDeckStack(deckStackPointer, findPositionOfDeckStacksCard(deckStackPointer, card));
     addCardToPlayer(&blackJackPlayerPointer->player, card);
     updatePlayersScore(blackJackPlayerPointer);
 
