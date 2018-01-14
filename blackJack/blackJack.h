@@ -4,7 +4,7 @@
 
 #include "../cardAPI/api.h"
 
-#define DECKSUSED 1
+#define DECKSUSED 2
 
 typedef struct blackJackPlayer {
     Player player;
@@ -13,8 +13,8 @@ typedef struct blackJackPlayer {
 } BlackJackPlayer;
 
 typedef struct probability {
-    int waysToAchieveScore;
-    int waysWithScoreToWin;
-    int waysWithScoreToDraw;
-    int waysWithScoreToLoose;
+    float waysToAchieveScore;
+    float waysWithScoreToWin;
+    float waysWithScoreToDraw;
+    float waysWithScoreToLoose;
 } Probability;

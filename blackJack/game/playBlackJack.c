@@ -64,7 +64,7 @@ void playBlackJack() {
             }
         }
 
-        if (!playerBust) {
+        if (!playerBust && !doesPlayerHaveBlackJack(&player)) {
             while (dealer.score < 17) {
                 dealBlackJack(&deckStack, &usedDeckStack, &dealer);
             }
