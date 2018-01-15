@@ -1,8 +1,8 @@
 #include <stdio.h>
 
-#include "../blackJack.h"
-#include "../blackJackPlayer.h"
-#include "../blackJackCard.h"
+#include "../blackJackAPI/blackJack.h"
+#include "../blackJackAPI/blackJackPlayer.h"
+#include "../blackJackAPI/blackJackCard.h"
 #include "../cardCount/probabilityCalculator.h"
 
 #include "../../generalAPI/userInput.h"
@@ -28,9 +28,9 @@ void playBlackJack() {
     int on = 1;
 
     while (on) {
-        dealBlackJack(&deckStack, &usedDeckStack, &player);
-        dealBlackJack(&deckStack, &usedDeckStack, &player);
-        dealBlackJack(&deckStack, &usedDeckStack, &dealer);
+        dealBlackJack(&deckStack, &usedDeckStack, &player, 0);
+        dealBlackJack(&deckStack, &usedDeckStack, &player, 0);
+        dealBlackJack(&deckStack, &usedDeckStack, &dealer, 0);
 
         int playerBust = 0;
         int dealerBust = 0;
@@ -52,7 +52,7 @@ void playBlackJack() {
             long option = getIntegerUserInput();
 
             if (option == 1) {
-                dealBlackJack(&deckStack, &usedDeckStack, &player);
+                dealBlackJack(&deckStack, &usedDeckStack, &player, 0);
                 if (player.score > 21) {
                     playerBust = 1;
                     printf("\n \n \nPLAYER HAS GONE BUST \n");
@@ -66,7 +66,7 @@ void playBlackJack() {
 
         if (!playerBust && !doesPlayerHaveBlackJack(&player)) {
             while (dealer.score < 17) {
-                dealBlackJack(&deckStack, &usedDeckStack, &dealer);
+                dealBlackJack(&deckStack, &usedDeckStack, &dealer, 0);
             }
 
             if (dealer.score > 21) {

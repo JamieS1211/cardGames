@@ -6,9 +6,9 @@
 
 #include "blackJack.h"
 
-#include "../cardAPI/deckStack.h"
-#include "../cardAPI/utilityFunctions.h"
-#include "../cardAPI/player.h"
+#include "../../cardAPI/deckStack.h"
+#include "../../cardAPI/utilityFunctions.h"
+#include "../../cardAPI/player.h"
 #include "blackJackPlayer.h"
 
 /**
@@ -33,8 +33,9 @@ int getCardValue(Card card) {
  * @param deckStackPointer                  Pointer to the deck stack to deal from
  * @param usedDeckStackPointer              Pointer to the deck stack of used cards to shuffle from if needed
  * @param blackJackPlayerPointer            Pointer to the black jack player to deal to
+ * @param silent                            Should this be done silently without printing output
  */
-void dealBlackJack(DeckStack *deckStackPointer, DeckStack *usedDeckStackPointer, BlackJackPlayer *blackJackPlayerPointer) {
+void dealBlackJack(DeckStack *deckStackPointer, DeckStack *usedDeckStackPointer, BlackJackPlayer *blackJackPlayerPointer, int silent) {
 
     if (deckStackPointer->cardsLeft == 0) {
         for (int i = 0; i < usedDeckStackPointer->cardsLeft; i++) {
@@ -46,18 +47,21 @@ void dealBlackJack(DeckStack *deckStackPointer, DeckStack *usedDeckStackPointer,
     Card card = dealCard(deckStackPointer, &blackJackPlayerPointer->player);
     updatePlayersScore(blackJackPlayerPointer);
 
-    char suit[120] = "";
-    char cardName[120] = "";
+    if (!silent) {
+        char suit[120] = "";
+        char cardName[120] = "";
 
-    getCardSuitName(suit, card);
-    getCardName(cardName, card);
+        getCardSuitName(suit, card);
+        getCardName(cardName, card);
 
-    printf("Dealt card %s of %s to \"%s\" giving score of: %i ", cardName, suit, blackJackPlayerPointer->player.playerName, blackJackPlayerPointer->score);
+        printf("Dealt card %s of %s to \"%s\" giving score of: %i ", cardName, suit,
+               blackJackPlayerPointer->player.playerName, blackJackPlayerPointer->score);
 
-    if (blackJackPlayerPointer->isScoreSoft) {
-        printf("or %i", blackJackPlayerPointer->score - 10);
+        if (blackJackPlayerPointer->isScoreSoft) {
+            printf("or %i", blackJackPlayerPointer->score - 10);
+        }
+        printf("\n");
     }
-    printf("\n");
 
 }
 

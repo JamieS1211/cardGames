@@ -7,10 +7,10 @@
 
 #include "blackJack.h"
 
-#include "../cardAPI/player.h"
+#include "../../cardAPI/player.h"
 #include "blackJackCard.h"
-#include "../cardAPI/deckStack.h"
-#include "../cardAPI/utilityFunctions.h"
+#include "../../cardAPI/deckStack.h"
+#include "../../cardAPI/utilityFunctions.h"
 
 /**
  * A function to initialise a black jack player with a given name
