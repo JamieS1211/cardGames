@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 #include "../blackJackAPI/blackJack.h"
 #include "../blackJackAPI/blackJackPlayer.h"
@@ -11,6 +13,9 @@
 #include "../../cardAPI/player.h"
 
 void playBlackJack() {
+
+
+    srand((unsigned int) time(NULL));
 
     DeckStack deckStack;
     initialiseFullDeckStack(&deckStack, DECKSUSED);
