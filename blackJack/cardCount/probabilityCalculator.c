@@ -2,7 +2,7 @@
 // Created by Jamie on 28/12/2017.
 //
 
-int layersToCalculate = 3;
+int layersToCalculate = 2;
 int possibleScores = 23;
 
 #include <stdio.h>
@@ -229,7 +229,7 @@ void calculateProbabilities(DeckStack *deckStackPointer, BlackJackPlayer *blackJ
  * @param blackJackDealerPointer
  */
 int stand(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer) {
-    int localLayersToCalculate = 1;
+    int localLayersToCalculate = 2;
 
     SimpleStack simpleStack;
     initialiseSimpleStackFromDeckStack(&simpleStack, deckStackPointer);
@@ -260,7 +260,7 @@ int stand(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer, 
         }
     }
 
-    calculatePlayerHitScores(&simpleStack, blackJackPlayerPointer, blackJackDealerPointer, tree, 0, 1, 1);
+    calculatePlayerHitScores(&simpleStack, blackJackPlayerPointer, blackJackDealerPointer, tree, 0, 1, localLayersToCalculate);
     updatePlayersScore(blackJackPlayerPointer);
     updatePlayersScore(blackJackDealerPointer);
 
@@ -278,6 +278,9 @@ int stand(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer, 
 
         for (int score = 0; score < possibleScores; score++) {
             totalWays += tree[layer][score].waysToAchieveScore;
+        }
+
+        for (int score = 0; score < possibleScores; score++) {
 
             if (tree[layer][score].waysToAchieveScore > 0) {
 
@@ -308,7 +311,6 @@ int stand(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer, 
 
     float lowestLose = 100;
     int bestChance = 0;
-    //TODO when is the probability improvement worth the risk of going bust from hitting?
     for (int layer = 0; layer < localLayersToCalculate; layer++) {
         if (cumulativeLose[layer] < lowestLose) {
             lowestLose = cumulativeLose[layer];
@@ -322,4 +324,104 @@ int stand(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer, 
     free(tree);
 
     return bestChance == 0;
+}
+
+float getExpectedValueOfHand(DeckStack *deckStackPointer) {
+    //TODO accurately find this value
+    float runningCount = 0;
+
+    for (int i = 0; i < deckStackPointer->cardsLeft; i++) {
+        switch (deckStackPointer->cardsInStack[i].cardID) {
+            case KING:
+            case QUEEN:
+            case JACK:
+            case TEN:
+            case ACE:
+                runningCount++;
+                break;
+            case TWO:
+            case THREE:
+            case FOUR:
+            case FIVE:
+            case SIX:
+                runningCount--;
+                break;
+        }
+    }
+
+    float decksLeft = (float) deckStackPointer->cardsLeft / 52;
+    float trueCount = runningCount / decksLeft;
+
+    return (trueCount - 1) / 2;
+}
+
+float getRealExpectedValueOfHand(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer) {
+
+    if (deckStackPointer->cardsLeft > 5) {
+        SimpleStack simpleStack;
+        initialiseSimpleStackFromDeckStack(&simpleStack, deckStackPointer);
+
+        int localLayersToCalculate = 2;
+
+        // Simplify all 10 score cards into one slot
+        for (int i = JACK; i <= KING; i++) {
+            while (simpleStack.cardsCountsInStack[i] > 0) {
+                simpleStack.cardsCountsInStack[10]++;
+                simpleStack.cardsCountsInStack[i]--;
+            }
+        }
+
+        float totalWin = 0;
+        float totalDraw = 0;
+        float totalLose = 0;
+
+        int weight = 1;
+
+        for (int i = 0; i < 10; i++) {
+            if (simpleStack.cardsCountsInStack[i] > 0) {
+                weight *= simpleStack.cardsCountsInStack[i];
+                simpleStack.cardsCountsInStack[i]--;
+                simpleStack.cardsLeft--;
+
+                for (int j = 0; j < 10; j++) {
+                    if (i <= j) {
+                        if (simpleStack.cardsCountsInStack[j] > 0) {
+                            weight *= simpleStack.cardsCountsInStack[j];
+                            simpleStack.cardsCountsInStack[j]--;
+                            simpleStack.cardsLeft--;
+
+                            for (int k = 0; k < 10; k++) {
+                                if (simpleStack.cardsCountsInStack[k] > 0) {
+                                    weight *= simpleStack.cardsCountsInStack[k];
+                                    simpleStack.cardsCountsInStack[k]--;
+                                    simpleStack.cardsLeft--;
+
+                                    //TODO Check if hit or stand, when stand work out probability of win lose and draw
+
+                                    simpleStack.cardsCountsInStack[k]++;
+                                    weight /= simpleStack.cardsCountsInStack[k];
+                                    simpleStack.cardsLeft++;
+                                }
+                            }
+
+                            simpleStack.cardsCountsInStack[j]++;
+                            weight /= simpleStack.cardsCountsInStack[j];
+                            simpleStack.cardsLeft++;
+                        }
+                    }
+                }
+
+                simpleStack.cardsCountsInStack[i]++;
+                weight /= simpleStack.cardsCountsInStack[i];
+                simpleStack.cardsLeft++;
+            }
+        }
+
+        int totalHands = deckStackPointer->cardsLeft * (deckStackPointer->cardsLeft - 1) * (deckStackPointer->cardsLeft - 2);
+
+        return (totalWin - totalLose) / totalHands;
+    } else {
+        return -1;
+    }
+
 }

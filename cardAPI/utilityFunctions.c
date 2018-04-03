@@ -94,8 +94,6 @@ void getCardName(char *cardNamePointer, Card card) {
  * @return                      Card that was dealt to player
  */
 Card dealCard(DeckStack *stackPointer, Player *playerPointer) {
-    srand((unsigned int) time(NULL));
-
     int cardPosition = rand() % stackPointer->cardsLeft;
 
     Card card = getCardFromDeckStack(stackPointer, cardPosition);

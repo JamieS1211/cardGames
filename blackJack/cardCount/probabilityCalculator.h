@@ -17,3 +17,13 @@ void calculateProbabilities(DeckStack *deckStackPointer, BlackJackPlayer *blackJ
  * @param blackJackDealerPointer
  */
 int stand(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer);
+
+/**
+ * A function that returns the expected value of the next hand
+ * @param deckStackPointer
+ * @return
+ */
+float getExpectedValueOfHand(DeckStack *deckStackPointer);
+
+
+float getRealExpectedValueOfHand(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer);
