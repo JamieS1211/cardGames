@@ -15,12 +15,13 @@
 
 #include "../../cardAPI/deckStack.h"
 #include "../../cardAPI/player.h"
+#include "../blackJackAPI/calculateBet.h"
 
-void automateBlackJack() {
+void automateBlackJack(int gamesSets, int gamesPerSet, float startBalance, float minBet, float maxBet, float riskFactor) {
 
     srand((unsigned int) time(NULL));
 
-    for (int totalTimes = 0; totalTimes < 20; totalTimes++) {
+    for (int set = 0; set < gamesSets; set++) {
 
         DeckStack deckStack;
         initialiseFullDeckStack(&deckStack, DECKSUSED);
@@ -41,21 +42,8 @@ void automateBlackJack() {
         int dealerWins = 0;
         int draws = 0;
 
-
-        int gamesToPlay = 10000;
-
-
-        float startBalance = 500;
-        float minBet = 0.1;
-        float maxBet = 1000;
-
-        float percentOfBalanceForMaxBet = 17.5;
-        float expectedValueOffset = -7;
-        float expectedValueMultiplier = 24;
-
-
         float balance = startBalance;
-        for (int i = 0; i < gamesToPlay; i++) {
+        for (int i = 0; i < gamesPerSet; i++) {
             //TODO correct for real occurances
             if (deckStack.cardsLeft < 5) {
                 for (int i = 0; i < usedDeckStack.cardsLeft; i++) {
@@ -76,21 +64,7 @@ void automateBlackJack() {
 
                 float expectedValue = getExpectedValueOfNextHand(&deckStack);
                 //float expectedValueReal = getRealExpectedValueOfNextHand(&deckStack, &player, &dealer);
-                float bet = minBet * (expectedValue + expectedValueOffset) * expectedValueMultiplier;
-
-                if (bet > balance * (percentOfBalanceForMaxBet / 100)) {
-                    bet = balance * (percentOfBalanceForMaxBet / 100);
-                }
-
-                if (bet > maxBet) {
-                    bet = maxBet;
-                } else if (bet < minBet) {
-                    bet = minBet;
-                }
-
-                if (bet > balance) {
-                    bet = balance;
-                }
+                float bet = calculateBet(expectedValue, minBet, maxBet, balance, riskFactor);
 
                 dealBlackJack(&deckStack, &usedDeckStack, &player, 1);
                 dealBlackJack(&deckStack, &usedDeckStack, &player, 1);
@@ -170,9 +144,10 @@ void automateBlackJack() {
         }
 
         printf("\nIn %i games, using the advised strategy the player won %i times, dealer won %i times and there was %i draws.\n",
-               gamesToPlay, playerWins, dealerWins, draws);
+               gamesPerSet, playerWins, dealerWins, draws);
         printf("Starting with $%g the player ended with $%g multiplying their money by %g \n", startBalance,
                balance, balance / startBalance);
+        printf("Settings for games: MinBet: %g  MaxBet: %g  RiskFactor: %g\n", minBet, maxBet, riskFactor);
     }
 
     printf("\n\n");

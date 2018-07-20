@@ -42,7 +42,6 @@ Card getCardFromPlayer(Player *playerPointer, int position) {
  * @param playerPointer         Pointer to the player
  * @param card                  Pointer to the card
  */
-//TODO URGENT ERROR HERE SEGMENTATION FAULT LINE 53
 void addCardToPlayer(Player *playerPointer, Card card) {
     playerPointer->cardsInHand++;
 

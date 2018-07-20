@@ -28,6 +28,8 @@ set(BLACK_JACK_API_SOURCE_FILES
 
         blackJack/game/automateBlackJack.h blackJack/game/automateBlackJack.c
         blackJack/game/playBlackJack.h blackJack/game/playBlackJack.c
+
+        blackJack/mapping.h blackJack/mapping.c
         )
 
 add_executable(blackJack
