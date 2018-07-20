@@ -42,6 +42,7 @@ Card getCardFromPlayer(Player *playerPointer, int position) {
  * @param playerPointer         Pointer to the player
  * @param card                  Pointer to the card
  */
+//TODO URGENT ERROR HERE SEGMENTATION FAULT LINE 53
 void addCardToPlayer(Player *playerPointer, Card card) {
     playerPointer->cardsInHand++;
 
@@ -83,7 +84,7 @@ void removeCardFromPlayersHand(Player *playerPointer, int position) {
 
     playerPointer->cardsInHand--;
 
-    realloc(playerPointer->cardsDealt, playerPointer->cardsInHand * sizeof(Card));
+    playerPointer->cardsDealt = realloc(playerPointer->cardsDealt, playerPointer->cardsInHand * sizeof(Card));
 
     for (int i = 0; i <= playerPointer->cardsInHand; i++) {
         if (i < position) {

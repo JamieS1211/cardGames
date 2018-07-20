@@ -10,6 +10,10 @@
 #include "blackJack/cardCount/cardCountBlackJack.h"
 
 int main() {
+
+    setbuf(stdout, 0); //Required so CLion shows tezt output when running in debug mode
+
+
     while (1) {
         printf("Please select an option? \n"
                        "\t1: Play BlackJack \n"

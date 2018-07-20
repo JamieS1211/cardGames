@@ -10,6 +10,7 @@ int possibleScores = 23;
 #include "../blackJackAPI/blackJack.h"
 #include "../../cardAPI/simpleStack.h"
 #include "../blackJackAPI/blackJackPlayer.h"
+#include "../../cardAPI/player.h"
 
 void printProbabilities(Probability **treePointer) {
 
@@ -224,21 +225,19 @@ void calculateProbabilities(DeckStack *deckStackPointer, BlackJackPlayer *blackJ
 
 /**
  * A function that returns 1 if should stand and 0 if should hit
- * @param deckStackPointer
+ * @param simpleStackPointer
  * @param blackJackPlayerPointer
  * @param blackJackDealerPointer
  */
-int stand(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer) {
-    int localLayersToCalculate = 2;
+int standSimpleStack(SimpleStack *simpleStackPointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer) {
+    int localLayersToCalculate = 2; //TODO this value is amount of iterations deep that is relevent for calculations. Higher = better but longer
 
-    SimpleStack simpleStack;
-    initialiseSimpleStackFromDeckStack(&simpleStack, deckStackPointer);
 
     // Simplify all 10 score cards into one slot
     for (int i = JACK; i <= KING; i++) {
-        while (simpleStack.cardsCountsInStack[i] > 0) {
-            simpleStack.cardsCountsInStack[10]++;
-            simpleStack.cardsCountsInStack[i]--;
+        while (simpleStackPointer->cardsCountsInStack[i] > 0) {
+            simpleStackPointer->cardsCountsInStack[10]++;
+            simpleStackPointer->cardsCountsInStack[i]--;
         }
     }
 
@@ -260,7 +259,7 @@ int stand(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer, 
         }
     }
 
-    calculatePlayerHitScores(&simpleStack, blackJackPlayerPointer, blackJackDealerPointer, tree, 0, 1, localLayersToCalculate);
+    calculatePlayerHitScores(simpleStackPointer, blackJackPlayerPointer, blackJackDealerPointer, tree, 0, 1, localLayersToCalculate);
     updatePlayersScore(blackJackPlayerPointer);
     updatePlayersScore(blackJackDealerPointer);
 
@@ -326,7 +325,21 @@ int stand(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer, 
     return bestChance == 0;
 }
 
-float getExpectedValueOfHand(DeckStack *deckStackPointer) {
+/**
+ * A function that returns 1 if should stand and 0 if should hit
+ * @param deckStackPointer
+ * @param blackJackPlayerPointer
+ * @param blackJackDealerPointer
+ */
+int stand(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer) {
+
+    SimpleStack simpleStack;
+    initialiseSimpleStackFromDeckStack(&simpleStack, deckStackPointer);
+
+    return standSimpleStack(&simpleStack, blackJackPlayerPointer, blackJackDealerPointer);
+}
+
+float getExpectedValueOfNextHand(DeckStack *deckStackPointer) {
     //TODO accurately find this value
     float runningCount = 0;
 
@@ -355,73 +368,101 @@ float getExpectedValueOfHand(DeckStack *deckStackPointer) {
     return (trueCount - 1) / 2;
 }
 
-float getRealExpectedValueOfHand(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer) {
+float getRealExpectedValueOfNextHand(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer,
+                                     BlackJackPlayer *blackJackDealerPointer) {
 
-    if (deckStackPointer->cardsLeft > 5) {
-        SimpleStack simpleStack;
-        initialiseSimpleStackFromDeckStack(&simpleStack, deckStackPointer);
+    SimpleStack simpleStack;
+    initialiseSimpleStackFromDeckStack(&simpleStack, deckStackPointer);
 
-        int localLayersToCalculate = 2;
-
-        // Simplify all 10 score cards into one slot
-        for (int i = JACK; i <= KING; i++) {
-            while (simpleStack.cardsCountsInStack[i] > 0) {
-                simpleStack.cardsCountsInStack[10]++;
-                simpleStack.cardsCountsInStack[i]--;
-            }
+    // Simplify all 10 score cards into one slot
+    for (int i = JACK; i <= KING; i++) {
+        while (simpleStack.cardsCountsInStack[i] > 0) {
+            simpleStack.cardsCountsInStack[10]++;
+            simpleStack.cardsCountsInStack[i]--;
         }
+    }
 
-        float totalWin = 0;
-        float totalDraw = 0;
-        float totalLose = 0;
+    float totalWin = 0;
+    float totalDraw = 0;
+    float totalLose = 0;
 
-        int weight = 1;
+    int weight = 1;
 
-        for (int i = 0; i < 10; i++) {
-            if (simpleStack.cardsCountsInStack[i] > 0) {
-                weight *= simpleStack.cardsCountsInStack[i];
-                simpleStack.cardsCountsInStack[i]--;
-                simpleStack.cardsLeft--;
 
-                for (int j = 0; j < 10; j++) {
-                    if (i <= j) {
-                        if (simpleStack.cardsCountsInStack[j] > 0) {
-                            weight *= simpleStack.cardsCountsInStack[j];
-                            simpleStack.cardsCountsInStack[j]--;
+    // For every card remaining deal to user
+    // Then follow computer directions to hit or stand using first 2 cards.
+    // When computer sa
+
+    Card dynamicCard;
+    dynamicCard.cardSuit = 0;
+
+    for (int i = 0; i < 10; i++) {
+        // Deal 1st card to player
+        if (simpleStack.cardsCountsInStack[i] > 0) {
+            weight *= simpleStack.cardsCountsInStack[i];
+            simpleStack.cardsCountsInStack[i]--;
+            simpleStack.cardsLeft--;
+
+            dynamicCard.cardID = i;
+            addCardToPlayer(&blackJackPlayerPointer->player, dynamicCard);
+            updatePlayersScore(blackJackPlayerPointer);
+
+            for (int j = 0; j < 10; j++) {
+                // Deal 2nd card to player
+                if (simpleStack.cardsCountsInStack[j] > 0) {
+                    weight *= simpleStack.cardsCountsInStack[j];
+                    simpleStack.cardsCountsInStack[j]--;
+                    simpleStack.cardsLeft--;
+
+                    dynamicCard.cardID = j;
+                    addCardToPlayer(&blackJackPlayerPointer->player, dynamicCard);
+                    updatePlayersScore(blackJackPlayerPointer);
+
+                    for (int k = 0; k < 10; k++) {
+                        // Deal 3rd card to dealer
+                        if (simpleStack.cardsCountsInStack[k] > 0) {
+                            weight *= simpleStack.cardsCountsInStack[k];
+                            simpleStack.cardsCountsInStack[k]--;
                             simpleStack.cardsLeft--;
 
-                            for (int k = 0; k < 10; k++) {
-                                if (simpleStack.cardsCountsInStack[k] > 0) {
-                                    weight *= simpleStack.cardsCountsInStack[k];
-                                    simpleStack.cardsCountsInStack[k]--;
-                                    simpleStack.cardsLeft--;
+                            dynamicCard.cardID = k;
+                            addCardToPlayer(&blackJackDealerPointer->player, dynamicCard);
+                            updatePlayersScore(blackJackDealerPointer);
 
-                                    //TODO Check if hit or stand, when stand work out probability of win lose and draw
+                            // Dealt first 3 cards
 
-                                    simpleStack.cardsCountsInStack[k]++;
-                                    weight /= simpleStack.cardsCountsInStack[k];
-                                    simpleStack.cardsLeft++;
-                                }
-                            }
 
-                            simpleStack.cardsCountsInStack[j]++;
-                            weight /= simpleStack.cardsCountsInStack[j];
+                            //TODO Check if hit or stand, when stand work out probability of win lose and draw
+
+
+                            // Un-deal cards
+
+                            removeCardFromBlackJackPlayersHand(blackJackDealerPointer, blackJackDealerPointer->player.cardsInHand - 1, 1);
+
+                            simpleStack.cardsCountsInStack[k]++;
+                            weight /= simpleStack.cardsCountsInStack[k];
                             simpleStack.cardsLeft++;
                         }
                     }
+
+                    removeCardFromBlackJackPlayersHand(blackJackPlayerPointer, blackJackPlayerPointer->player.cardsInHand - 1, 1);
+
+                    simpleStack.cardsCountsInStack[j]++;
+                    weight /= simpleStack.cardsCountsInStack[j];
+                    simpleStack.cardsLeft++;
                 }
-
-                simpleStack.cardsCountsInStack[i]++;
-                weight /= simpleStack.cardsCountsInStack[i];
-                simpleStack.cardsLeft++;
             }
+
+            removeCardFromBlackJackPlayersHand(blackJackPlayerPointer, blackJackPlayerPointer->player.cardsInHand - 1, 1);
+
+            simpleStack.cardsCountsInStack[i]++;
+            weight /= simpleStack.cardsCountsInStack[i];
+            simpleStack.cardsLeft++;
         }
-
-        int totalHands = deckStackPointer->cardsLeft * (deckStackPointer->cardsLeft - 1) * (deckStackPointer->cardsLeft - 2);
-
-        return (totalWin - totalLose) / totalHands;
-    } else {
-        return -1;
     }
 
+    int totalHands =
+            deckStackPointer->cardsLeft * (deckStackPointer->cardsLeft - 1) * (deckStackPointer->cardsLeft - 2);
+
+    return (totalWin - totalLose) / totalHands;
 }

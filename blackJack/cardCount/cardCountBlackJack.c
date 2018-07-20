@@ -1,3 +1,6 @@
+//
+// Created by Jamie on 23/12/2017.
+//
 
 #include <stdio.h>
 #include "../blackJackAPI/blackJack.h"
@@ -89,13 +92,16 @@ void cardCountBlackJack() {
 
         for (int i = player.player.cardsInHand; i > 0; i--) {
             addCardToDeckStack(&usedDeckStack, getCardFromPlayer(&player.player, 0));
-            removeCardFromBlackJackPlayersHand(&player, 0);
+            removeCardFromBlackJackPlayersHand(&player, 0, 0);
         }
 
         for (int i = dealer.player.cardsInHand; i > 0; i--) {
             addCardToDeckStack(&usedDeckStack, getCardFromPlayer(&dealer.player, 0));
-            removeCardFromBlackJackPlayersHand(&dealer, 0);
+            removeCardFromBlackJackPlayersHand(&dealer, 0, 0);
         }
+
+        updatePlayersScore(&player);
+        updatePlayersScore(&dealer);
 
 
         while (1) {

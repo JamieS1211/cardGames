@@ -2,6 +2,9 @@
 // Created by Jamie on 21/12/2017.
 //
 
+#ifndef CARDAPI_DECKSTACK_H
+#define CARDAPI_DECKSTACK_H
+
 /**
  * A function to initialise a deck stack full of cards taking the pointer to the deck stack and number of decks
  * @param deckStackPointer                 Pointer to stack
@@ -46,3 +49,6 @@ int findPositionOfDeckStacksCard(DeckStack *deckStackPointer, Card card);
  * @param position               Position of card
  */
 void removeCardFromDeckStack(DeckStack *deckStackPointer, int position);
+
+
+#endif //CARDAPI_DECKSTACK_H

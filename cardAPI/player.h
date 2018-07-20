@@ -2,6 +2,10 @@
 // Created by Jamie on 21/12/2017.
 //
 
+
+#ifndef CARDAPI_PLAYER_H
+#define CARDAPI_PLAYER_H
+
 /**
  * A function to initialise a player with a given name
  * @param playerPointer        Pointer to the player
@@ -45,3 +49,6 @@ void removeCardFromPlayersHand(Player *playerPointer, int position);
  * @param player        The player
  */
 void listCardsOfPlayer(Player player);
+
+
+#endif //CARDAPI_PLAYER_H

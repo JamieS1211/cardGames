@@ -2,6 +2,9 @@
 // Created by Jamie on 21/12/2017.
 //
 
+#ifndef CARDAPI_UTILITYFUNCTIONS_H
+#define CARDAPI_UTILITYFUNCTIONS_H
+
 /**
  * A function that updates a pointer to a character array and pointer to a card and updates the character array to be the suit of the card
  * @param cardName          Pointer to character array to store suit of card
@@ -30,3 +33,6 @@ Card dealCard(DeckStack *stackPointer, Player *playerPointer);
  * @return              The card the user specified
  */
 Card getCardDealt();
+
+
+#endif //CARDAPI_UTILITYFUNCTIONS_H

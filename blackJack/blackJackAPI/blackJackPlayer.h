@@ -2,6 +2,9 @@
 // Created by Jamie on 22/12/2017.
 //
 
+#ifndef BLACKJACK_BLACKJACKAPI_BLACKJACKPLAYER_H
+#define BLACKJACK_BLACKJACKAPI_BLACKJACKPLAYER_H
+
 /**
  * A function to initialise a black jack player with a given name
  * @param blackJackPlayerPointer        Pointer to the black jack player
@@ -25,8 +28,9 @@ void updatePlayersScore(BlackJackPlayer *blackJackPlayerPointer);
  * A function to remove a card from a black jack player
  * @param blackJackPlayerPointer        Pointer to the black jack player
  * @param position                      Position
+ * @param updateScore                   If the players score should be updated
  */
-void removeCardFromBlackJackPlayersHand(BlackJackPlayer *blackJackPlayerPointer, int position);
+void removeCardFromBlackJackPlayersHand(BlackJackPlayer *blackJackPlayerPointer, int position, int updateScore);
 
 /**
  * A function to return if a black jack player has a blackjack
@@ -49,3 +53,6 @@ void moveCardFromSimpleStackToBlackJackPlayer(SimpleStack *simpleStackPointer, i
  * @param blackJackPlayerPointer        Pointer to the black jack player
  */
 void moveLastCardFromBlackJackPlayerToSimpleStack(SimpleStack *simpleStackPointer, BlackJackPlayer *blackJackPlayerPointer);
+
+
+#endif //BLACKJACK_BLACKJACKAPI_BLACKJACKPLAYER_H

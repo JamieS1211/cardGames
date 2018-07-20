@@ -99,7 +99,7 @@ void removeCardFromDeckStack(DeckStack *deckStackPointer, int position) {
 
     deckStackPointer->cardsLeft--;
 
-    realloc(deckStackPointer->cardsInStack, deckStackPointer->cardsLeft * sizeof(Card));
+    deckStackPointer->cardsInStack = realloc(deckStackPointer->cardsInStack, deckStackPointer->cardsLeft * sizeof(Card));
 
     for (int i = 0; i <= deckStackPointer->cardsLeft; i++) {
         if (i < position) {

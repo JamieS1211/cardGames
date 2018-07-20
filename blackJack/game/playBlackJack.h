@@ -1,2 +1,10 @@
+//
+// Created by Jamie on 23/12/2017.
+//
+
+#ifndef BLACKJACK_GAME_PLAYBLACKJACK_H
+#define BLACKJACK_GAME_PLAYBLACKJACK_H
 
 void playBlackJack();
+
+#endif //BLACKJACK_GAME_PLAYBLACKJACK_H

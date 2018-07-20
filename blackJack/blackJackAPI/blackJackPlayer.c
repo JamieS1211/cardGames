@@ -61,10 +61,14 @@ void updatePlayersScore(BlackJackPlayer *blackJackPlayerPointer) {
  * A function to remove a card from a black jack player
  * @param blackJackPlayerPointer        Pointer to the black jack player
  * @param position                      Position
+ * @param updateScore                   If the players score should be updated
  */
-void removeCardFromBlackJackPlayersHand(BlackJackPlayer *blackJackPlayerPointer, int position) {
+void removeCardFromBlackJackPlayersHand(BlackJackPlayer *blackJackPlayerPointer, int position, int updateScore) {
     removeCardFromPlayersHand(&blackJackPlayerPointer->player, position);
-    updatePlayersScore(blackJackPlayerPointer);
+
+    if (updateScore) {
+        updatePlayersScore(blackJackPlayerPointer);
+    }
 }
 
 /**

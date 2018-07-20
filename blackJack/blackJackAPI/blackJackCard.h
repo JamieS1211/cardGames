@@ -2,6 +2,9 @@
 // Created by Jamie on 21/12/2017.
 //
 
+#ifndef BLACKJACK_BLACKJACKAPI_BLACKJACKCARD_H
+#define BLACKJACK_BLACKJACKAPI_BLACKJACKCARD_H
+
 /**
  * A function to return the maximum value of a card
  * @param card
@@ -26,3 +29,6 @@ void dealBlackJack(DeckStack *deckStackPointer, DeckStack *usedDeckStackPointer,
  * @param card              The card to give the player
  */
 void giveBlackJackPlayerCard(DeckStack *deckStackPointer, DeckStack *usedDeckStackPointer, BlackJackPlayer *blackJackPlayerPointer, Card card);
+
+
+#endif //BLACKJACK_BLACKJACKAPI_BLACKJACKCARD_H

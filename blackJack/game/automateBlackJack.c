@@ -1,3 +1,7 @@
+//
+// Created by Jamie on 23/12/2017.
+//
+
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
@@ -70,8 +74,8 @@ void automateBlackJack() {
                 }
 
 
-                float expectedValue = getExpectedValueOfHand(&deckStack);
-                //float expectedValueReal = getRealExpectedValueOfHand(&deckStack, &player, &dealer);
+                float expectedValue = getExpectedValueOfNextHand(&deckStack);
+                //float expectedValueReal = getRealExpectedValueOfNextHand(&deckStack, &player, &dealer);
                 float bet = minBet * (expectedValue + expectedValueOffset) * expectedValueMultiplier;
 
                 if (bet > balance * (percentOfBalanceForMaxBet / 100)) {
@@ -148,13 +152,17 @@ void automateBlackJack() {
 
                 for (int i = player.player.cardsInHand; i > 0; i--) {
                     addCardToDeckStack(&usedDeckStack, getCardFromPlayer(&player.player, 0));
-                    removeCardFromBlackJackPlayersHand(&player, 0);
+                    removeCardFromBlackJackPlayersHand(&player, 0, 0);
                 }
 
                 for (int i = dealer.player.cardsInHand; i > 0; i--) {
                     addCardToDeckStack(&usedDeckStack, getCardFromPlayer(&dealer.player, 0));
-                    removeCardFromBlackJackPlayersHand(&dealer, 0);
+                    removeCardFromBlackJackPlayersHand(&dealer, 0, 0);
                 }
+
+                updatePlayersScore(&player);
+                updatePlayersScore(&dealer);
+
             } else {
                 srand((unsigned int) i);
                 break;

@@ -2,6 +2,9 @@
 // Created by Jamie on 20/12/2017.
 //
 
+#ifndef CARDAPI_API_H
+#define CARDAPI_API_H
+
 #define NUMBER_OF_SUITS 4
 #define NUMBER_OF_CARDS 13
 
@@ -49,3 +52,6 @@ typedef struct player {
     int cardsInHand;
     Card *cardsDealt;
 } Player;
+
+
+#endif //CARDAPI_API_H
