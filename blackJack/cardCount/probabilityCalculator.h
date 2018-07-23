@@ -34,10 +34,10 @@ int standSimpleStack(SimpleStack *simpleStackPointer, BlackJackPlayer *blackJack
  * @param deckStackPointer
  * @return
  */
-float getExpectedValueOfNextHand(DeckStack *deckStackPointer);
+float getExpectedValueOfNextHandRunningCount(DeckStack *deckStackPointer);
 
 
-float getRealExpectedValueOfNextHand(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer,
+float getExpectedValueOfNextHandReal(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer,
                                      BlackJackPlayer *blackJackDealerPointer);
 
 

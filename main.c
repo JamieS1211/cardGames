@@ -3,6 +3,9 @@
 //
 
 #include <stdio.h>
+#include <omp.h>
+#include <afxres.h>
+#include <gmp.h>
 
 #include "generalAPI/userInput.h"
 #include "blackJack/game/playBlackJack.h"
@@ -12,7 +15,57 @@
 
 int main() {
 
-    setbuf(stdout, 0); //Required so CLion shows tezt output when running in debug mode
+    setbuf(stdout, 0); //Required so CLion shows "printf" output when running in debug mode
+
+
+    //GMP example
+    /*
+    mpz_t x,y,result;
+
+    mpz_init_set_str(x, "7612058254738945", 10);
+    mpz_init_set_str(y, "9263591128439081", 10);
+    mpz_init(result);
+
+    mpz_mul(result, x, y);
+    gmp_printf("    %Zd\n"
+               "*\n"
+               "    %Zd\n"
+               "--------------------\n"
+               "%Zd\n", x, y, result);
+
+    // free used memory
+    mpz_clear(x);
+    mpz_clear(y);
+    mpz_clear(result);
+
+    return 0;*/
+
+    //Multi-threading example
+    /*
+    double start, end;
+    double runTime;
+    start = omp_get_wtime();
+    int num = 1,primes = 0;
+
+    int limit = 100000;
+
+    #pragma omp parallel for schedule(dynamic) reduction(+ : primes)
+    for (num = 1; num <= limit; num++) {
+        int i = 2;
+        while(i <= num) {
+            if(num % i == 0)
+                break;
+            i++;
+        }
+        if(i == num)
+            primes++;
+    }
+
+    end = omp_get_wtime();
+    runTime = end - start;
+    printf("This machine calculated all %d prime numbers under %d in %g seconds\n",primes,limit,runTime);
+
+    return 0;*/
 
 
     while (1) {
@@ -34,20 +87,20 @@ int main() {
 
             void automateBlackJack(int gamesSets, int gamesPerSet, float startBalance, float minBet, float maxBet, float riskFactor);
 
-            int gameSets = 20;
-            int gamesPerSet = 1000;
+            int gameSets = 10;
+            int gamesPerSet = 100000;
 
             float startBalance = 10000;
-            float minBet = 0.1;
+            float minBet = 25;
             float maxBet = 1000;
 
             //Lower value is less risk (values lower then 0.02 are required)
-            float riskFactor = 0.005;
+            float riskFactor = 0.007;
 
             automateBlackJack(gameSets, gamesPerSet, startBalance, minBet, maxBet, riskFactor);
         } else if (option == 4) {
             int setsPerTest = 1;
-            int gamesPerSet = 1000;
+            int gamesPerSet = 100000;
 
             findMapping(setsPerTest, gamesPerSet);
         } else if (option == 5) {

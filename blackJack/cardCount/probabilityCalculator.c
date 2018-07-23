@@ -339,8 +339,7 @@ int stand(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer, 
     return standSimpleStack(&simpleStack, blackJackPlayerPointer, blackJackDealerPointer);
 }
 
-float getExpectedValueOfNextHand(DeckStack *deckStackPointer) {
-    //TODO accurately find this value
+float getExpectedValueOfNextHandRunningCount(DeckStack *deckStackPointer) {
     float runningCount = 0;
 
     for (int i = 0; i < deckStackPointer->cardsLeft; i++) {
@@ -365,10 +364,20 @@ float getExpectedValueOfNextHand(DeckStack *deckStackPointer) {
     float decksLeft = (float) deckStackPointer->cardsLeft / 52;
     float trueCount = runningCount / decksLeft;
 
-    return (trueCount - 1) / 2;
+    /* Expectation
+     * Can be +tive or - tive
+     * Represents decimal percent of bet you expect to win by betting
+     * -0.03 means you expect to lose 3% of your bet from betting
+     * this can be considered to be a multiplier of (100 - E)% for each bet
+     * This is given by:
+     * (chance of winning * value of winning) - (chance of losing * value of losing)
+    */
+    float expectation = (trueCount - 1) / 2;
+
+    return expectation;
 }
 
-float getRealExpectedValueOfNextHand(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer,
+float getExpectedValueOfNextHandReal(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer,
                                      BlackJackPlayer *blackJackDealerPointer) {
 
     SimpleStack simpleStack;
@@ -393,8 +402,10 @@ float getRealExpectedValueOfNextHand(DeckStack *deckStackPointer, BlackJackPlaye
     // Then follow computer directions to hit or stand using first 2 cards.
     // When computer sa
 
-    Card dynamicCard;
-    dynamicCard.cardSuit = 0;
+    Card firstCard, secondCard, thirdCard;
+    firstCard.cardSuit = 0;
+    secondCard.cardSuit = 0;
+    thirdCard.cardSuit = 0;
 
     for (int i = 0; i < 10; i++) {
         // Deal 1st card to player
@@ -403,19 +414,24 @@ float getRealExpectedValueOfNextHand(DeckStack *deckStackPointer, BlackJackPlaye
             simpleStack.cardsCountsInStack[i]--;
             simpleStack.cardsLeft--;
 
-            dynamicCard.cardID = i;
-            addCardToPlayer(&blackJackPlayerPointer->player, dynamicCard);
-            updatePlayersScore(blackJackPlayerPointer);
+            firstCard.cardID = i;
+            addCardToPlayer(&blackJackPlayerPointer->player, firstCard);
 
-            for (int j = 0; j < 10; j++) {
+            for (int j = i; j < 10; j++) {
                 // Deal 2nd card to player
                 if (simpleStack.cardsCountsInStack[j] > 0) {
                     weight *= simpleStack.cardsCountsInStack[j];
                     simpleStack.cardsCountsInStack[j]--;
                     simpleStack.cardsLeft--;
 
-                    dynamicCard.cardID = j;
-                    addCardToPlayer(&blackJackPlayerPointer->player, dynamicCard);
+                    secondCard.cardID = j;
+                    addCardToPlayer(&blackJackPlayerPointer->player, secondCard);
+
+                    if (i != j) {
+                        weight *= 2; //Corrects weights for occurrences that can happen in 2 ways
+                    }
+
+
                     updatePlayersScore(blackJackPlayerPointer);
 
                     for (int k = 0; k < 10; k++) {
@@ -425,14 +441,14 @@ float getRealExpectedValueOfNextHand(DeckStack *deckStackPointer, BlackJackPlaye
                             simpleStack.cardsCountsInStack[k]--;
                             simpleStack.cardsLeft--;
 
-                            dynamicCard.cardID = k;
-                            addCardToPlayer(&blackJackDealerPointer->player, dynamicCard);
+                            thirdCard.cardID = k;
+                            addCardToPlayer(&blackJackDealerPointer->player, thirdCard);
                             updatePlayersScore(blackJackDealerPointer);
 
                             // Dealt first 3 cards
 
 
-                            //TODO Check if hit or stand, when stand work out probability of win lose and draw
+                            //TODO Check if hit or stand, when stand work out probability of win lose and draw. If hit we must then simulate once for every card the player could recieve. If stand we must find percentage of win draw and loss
 
 
                             // Un-deal cards
@@ -450,6 +466,10 @@ float getRealExpectedValueOfNextHand(DeckStack *deckStackPointer, BlackJackPlaye
                     simpleStack.cardsCountsInStack[j]++;
                     weight /= simpleStack.cardsCountsInStack[j];
                     simpleStack.cardsLeft++;
+
+                    if (i != j) {
+                        weight /= 2; //Corrects weights for occurrences that can happen in 2 ways
+                    }
                 }
             }
 

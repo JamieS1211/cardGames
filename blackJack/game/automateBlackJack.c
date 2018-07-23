@@ -44,8 +44,8 @@ void automateBlackJack(int gamesSets, int gamesPerSet, float startBalance, float
 
         float balance = startBalance;
         for (int i = 0; i < gamesPerSet; i++) {
-            //TODO correct for real occurances
-            if (deckStack.cardsLeft < 5) {
+            float cardRemainingPercent = usedDeckStack.cardsLeft / (DECKSUSED * NUMBER_OF_SUITS * NUMBER_OF_CARDS) * 100;
+            if (cardRemainingPercent < 40) {
                 for (int i = 0; i < usedDeckStack.cardsLeft; i++) {
                     addCardToDeckStack(&deckStack, getCardFromDeckStack(&usedDeckStack, i));
                     removeCardFromDeckStack(&usedDeckStack, i);
@@ -62,8 +62,8 @@ void automateBlackJack(int gamesSets, int gamesPerSet, float startBalance, float
                 }
 
 
-                float expectedValue = getExpectedValueOfNextHand(&deckStack);
-                //float expectedValueReal = getRealExpectedValueOfNextHand(&deckStack, &player, &dealer);
+                float expectedValue = getExpectedValueOfNextHandRunningCount(&deckStack);
+                //float expectedValueReal = getExpectedValueOfNextHandReal(&deckStack, &player, &dealer);
                 float bet = calculateBet(expectedValue, minBet, maxBet, balance, riskFactor);
 
                 dealBlackJack(&deckStack, &usedDeckStack, &player, 1);
