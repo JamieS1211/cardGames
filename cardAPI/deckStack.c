@@ -111,3 +111,22 @@ void removeCardFromDeckStack(DeckStack *deckStackPointer, int position) {
         }
     }
 }
+
+/**
+ * A function to move all contents of a deck stack to another deck stack
+ * @param deckStackPointerFrom              Pointer to deck stack for where cards are being moved from
+ * @param deckStackPointerTo                Position to deck stack for where cards are being moved to
+ */
+void moveAllDeckStackContents(DeckStack *deckStackPointerFrom, DeckStack *deckStackPointerTo) {
+    deckStackPointerTo->cardsInStack = realloc(deckStackPointerTo->cardsInStack, (deckStackPointerTo->cardsLeft + deckStackPointerFrom->cardsLeft) * sizeof(Card));
+
+    for (int i = 0; i < deckStackPointerFrom->cardsLeft; i++) {
+        deckStackPointerTo->cardsInStack[deckStackPointerTo->cardsLeft + i].cardSuit = deckStackPointerFrom->cardsInStack[i].cardSuit;
+        deckStackPointerTo->cardsInStack[deckStackPointerTo->cardsLeft + i].cardID = deckStackPointerFrom->cardsInStack[i].cardID;
+    }
+
+    deckStackPointerTo->cardsLeft = deckStackPointerFrom->cardsLeft + deckStackPointerTo->cardsLeft;
+
+    deckStackPointerFrom->cardsLeft = 0;
+    deckStackPointerFrom->cardsInStack = realloc(deckStackPointerFrom->cardsInStack, deckStackPointerFrom->cardsLeft * sizeof(Card));
+}

@@ -17,9 +17,15 @@
 #include "../../cardAPI/player.h"
 #include "../blackJackAPI/calculateBet.h"
 
-void automateBlackJack(int gamesSets, int gamesPerSet, float startBalance, float minBet, float maxBet, float riskFactor) {
+void automateBlackJack(int gamesSets, int gamesPerSet, float startBalance, float minBet, float maxBet, float riskFactor) {clock_t start, end;
+    double runTime;
+
+    start = clock();
 
     srand((unsigned int) time(NULL));
+
+    float percentRemainingForShuffle = 20;
+    int cardShuffleThreshold = (DECKSUSED * NUMBER_OF_SUITS * NUMBER_OF_CARDS) * percentRemainingForShuffle / 100;
 
     for (int set = 0; set < gamesSets; set++) {
 
@@ -29,6 +35,46 @@ void automateBlackJack(int gamesSets, int gamesPerSet, float startBalance, float
         DeckStack usedDeckStack;
         initialiseEmptyDeckStack(&usedDeckStack, DECKSUSED);
 
+/* Testing code to test efficiency of new code
+
+
+        int totalShuffles = 500000;
+
+
+        clock_t start, end;
+        double runTime;
+
+        start = clock();
+        for (int i = 0; i < totalShuffles; i++) {
+
+            for (int i = 0; i < deckStack.cardsLeft; i++) {
+                addCardToDeckStack(&usedDeckStack, getCardFromDeckStack(&deckStack, i));
+                removeCardFromDeckStack(&deckStack, i);
+            }
+
+            for (int i = 0; i < usedDeckStack.cardsLeft; i++) {
+                addCardToDeckStack(&deckStack, getCardFromDeckStack(&usedDeckStack, i));
+                removeCardFromDeckStack(&usedDeckStack, i);
+            }
+        }
+
+
+        end = clock();
+        runTime = (end - start) / (double) CLOCKS_PER_SEC;
+        printf("Completed old code in %g seconds\n", runTime);
+
+
+        start = clock();
+        for (int i = 0; i < totalShuffles; i++) {
+            moveAllDeckStackContents(&deckStack, &usedDeckStack);
+            moveAllDeckStackContents(&usedDeckStack, &deckStack);
+        }
+
+        end = clock();
+        runTime = (end - start) / (double) CLOCKS_PER_SEC;
+        printf("Completed new code in %g seconds\n", runTime);
+
+        return;*/
 
         BlackJackPlayer player;
         initialiseBlackJackPlayer(&player, "Player");
@@ -36,35 +82,30 @@ void automateBlackJack(int gamesSets, int gamesPerSet, float startBalance, float
         BlackJackPlayer dealer;
         initialiseBlackJackPlayer(&dealer, "Dealer");
 
-        srand((unsigned int) time(NULL));
-
         int playerWins = 0;
         int dealerWins = 0;
         int draws = 0;
 
         float balance = startBalance;
         for (int i = 0; i < gamesPerSet; i++) {
-            float cardRemainingPercent = usedDeckStack.cardsLeft / (DECKSUSED * NUMBER_OF_SUITS * NUMBER_OF_CARDS) * 100;
-            if (cardRemainingPercent < 40) {
-                for (int i = 0; i < usedDeckStack.cardsLeft; i++) {
-                    addCardToDeckStack(&deckStack, getCardFromDeckStack(&usedDeckStack, i));
-                    removeCardFromDeckStack(&usedDeckStack, i);
-                }
-            }
 
             if (balance >= minBet) {
 
-                if (deckStack.cardsLeft == 0) {
-                    for (int i = 0; i < usedDeckStack.cardsLeft; i++) {
-                        addCardToDeckStack(&deckStack, getCardFromDeckStack(&usedDeckStack, i));
-                        removeCardFromDeckStack(&usedDeckStack, i);
-                    }
+                if (deckStack.cardsLeft < cardShuffleThreshold) {
+                    //New method
+                    moveAllDeckStackContents(&usedDeckStack, &deckStack);
+
+                    //Old method
+                    //for (int i = 0; i < usedDeckStack.cardsLeft; i++) {
+                    //    addCardToDeckStack(&deckStack, getCardFromDeckStack(&usedDeckStack, i));
+                    //    removeCardFromDeckStack(&usedDeckStack, i);
+                    //}
                 }
 
 
                 float expectedValue = getExpectedValueOfNextHandRunningCount(&deckStack);
                 //float expectedValueReal = getExpectedValueOfNextHandReal(&deckStack, &player, &dealer);
-                float bet = calculateBet(expectedValue, minBet, maxBet, balance, riskFactor);
+                float bet = standardBetExpectedValue(expectedValue, minBet);
 
                 dealBlackJack(&deckStack, &usedDeckStack, &player, 1);
                 dealBlackJack(&deckStack, &usedDeckStack, &player, 1);
@@ -138,7 +179,6 @@ void automateBlackJack(int gamesSets, int gamesPerSet, float startBalance, float
                 updatePlayersScore(&dealer);
 
             } else {
-                srand((unsigned int) i);
                 break;
             }
         }
@@ -149,6 +189,13 @@ void automateBlackJack(int gamesSets, int gamesPerSet, float startBalance, float
                balance, balance / startBalance);
         printf("Settings for games: MinBet: %g  MaxBet: %g  RiskFactor: %g\n", minBet, maxBet, riskFactor);
     }
+
+    printf("\n\n");
+
+
+    end = clock();
+    runTime = (end - start) / (double) CLOCKS_PER_SEC;
+    printf("Completed large function using new code in %g seconds\n", runTime);
 
     printf("\n\n");
 }

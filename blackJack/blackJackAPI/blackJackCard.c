@@ -38,10 +38,8 @@ int getCardValue(Card card) {
 void dealBlackJack(DeckStack *deckStackPointer, DeckStack *usedDeckStackPointer, BlackJackPlayer *blackJackPlayerPointer, int silent) {
 
     if (deckStackPointer->cardsLeft == 0) {
-        for (int i = 0; i < usedDeckStackPointer->cardsLeft; i++) {
-            addCardToDeckStack(deckStackPointer, getCardFromDeckStack(usedDeckStackPointer, i));
-            removeCardFromDeckStack(usedDeckStackPointer, i);
-        }
+        printf("ERROR: No more cards to deal \n");
+        return;
     }
 
     Card card = dealCard(deckStackPointer, &blackJackPlayerPointer->player);

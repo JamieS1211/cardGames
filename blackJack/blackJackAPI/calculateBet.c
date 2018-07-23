@@ -4,10 +4,8 @@
 
 #import "calculateBet.h"
 
+//TODO FIND OPTIMUM SETTINGS
 float calculateBet(float expectedValue, float minBet, float maxBet, float currentCash, float riskFactor) {
-
-    return standardBetExpectedValue(expectedValue, minBet);
-
     float bet;
 
     float maxAllowableBet = maxBet;
@@ -25,10 +23,6 @@ float calculateBet(float expectedValue, float minBet, float maxBet, float curren
     }
 
     return bet;
-}
-
-float standardBetTrueCount(float trueCount, float minBet) {
-    return (trueCount - 1) * minBet;
 }
 
 float standardBetExpectedValue(float expectedValue, float minBet) {

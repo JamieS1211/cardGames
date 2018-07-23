@@ -84,11 +84,8 @@ int main() {
         } else if (option == 2) {
             cardCountBlackJack();
         } else if (option == 3) {
-
-            void automateBlackJack(int gamesSets, int gamesPerSet, float startBalance, float minBet, float maxBet, float riskFactor);
-
             int gameSets = 10;
-            int gamesPerSet = 100000;
+            int gamesPerSet = 1000;
 
             float startBalance = 10000;
             float minBet = 25;

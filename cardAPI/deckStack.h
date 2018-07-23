@@ -50,5 +50,12 @@ int findPositionOfDeckStacksCard(DeckStack *deckStackPointer, Card card);
  */
 void removeCardFromDeckStack(DeckStack *deckStackPointer, int position);
 
+/**
+ * A function to move all contents of a deck stack to another deck stack
+ * @param deckStackPointerFrom              Pointer to deck stack for where cards are being moved from
+ * @param deckStackPointerTo                Position to deck stack for where cards are being moved to
+ */
+void moveAllDeckStackContents(DeckStack *deckStackPointerFrom, DeckStack *deckStackPointerTo);
+
 
 #endif //CARDAPI_DECKSTACK_H
