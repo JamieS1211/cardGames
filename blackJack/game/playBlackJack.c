@@ -15,6 +15,7 @@
 
 #include "../../cardAPI/deckStack.h"
 #include "../../cardAPI/player.h"
+#include "../../cardAPI/simpleStack.h"
 
 void playBlackJack() {
 
@@ -27,6 +28,17 @@ void playBlackJack() {
     DeckStack usedDeckStack;
     initialiseEmptyDeckStack(&usedDeckStack, DECKSUSED);
 
+    SimpleStack simpleDeckStack;
+    initialiseSimpleStackFromDeckStack(&simpleDeckStack, &deckStack);
+
+    // Simplify all 10 score cards into one slot
+    for (int i = JACK; i <= KING; i++) {
+        while (simpleDeckStack.cardsCountsInStack[i] > 0) {
+            simpleDeckStack.cardsCountsInStack[10]++;
+            simpleDeckStack.cardsCountsInStack[i]--;
+        }
+    }
+
 
     BlackJackPlayer player;
     initialiseBlackJackPlayer(&player, "Player");
@@ -37,9 +49,9 @@ void playBlackJack() {
     int on = 1;
 
     while (on) {
-        dealBlackJack(&deckStack, &usedDeckStack, &player, 0);
-        dealBlackJack(&deckStack, &usedDeckStack, &player, 0);
-        dealBlackJack(&deckStack, &usedDeckStack, &dealer, 0);
+        dealBlackJack(&deckStack, &simpleDeckStack, &player, 0);
+        dealBlackJack(&deckStack, &simpleDeckStack, &player, 0);
+        dealBlackJack(&deckStack, &simpleDeckStack, &dealer, 0);
 
         int playerBust = 0;
         int dealerBust = 0;
@@ -61,7 +73,7 @@ void playBlackJack() {
             long option = getIntegerUserInput();
 
             if (option == 1) {
-                dealBlackJack(&deckStack, &usedDeckStack, &player, 0);
+                dealBlackJack(&deckStack, &simpleDeckStack, &player, 0);
                 if (player.score > 21) {
                     playerBust = 1;
                     printf("\n \n \nPLAYER HAS GONE BUST \n");
@@ -75,7 +87,7 @@ void playBlackJack() {
 
         if (!playerBust && !doesPlayerHaveBlackJack(&player)) {
             while (dealer.score < 17) {
-                dealBlackJack(&deckStack, &usedDeckStack, &dealer, 0);
+                dealBlackJack(&deckStack, &simpleDeckStack, &dealer, 0);
             }
 
             if (dealer.score > 21) {

@@ -8,6 +8,8 @@
 #include "../../cardAPI/api.h"
 
 #define DECKSUSED 1
+#define LAYERSTOCALCULATE 2
+#define POSSIBLESCORES 23
 
 typedef struct blackJackPlayer {
     Player player;
@@ -21,5 +23,9 @@ typedef struct probability {
     unsigned long long waysWithScoreToDraw;
     unsigned long long waysWithScoreToLoose;
 } Probability;
+
+typedef struct probabilityTree {
+    Probability **tree;
+} ProbabilityTree;
 
 #endif //BLACKJACK_BLACKJACKAPI_BLACKJACK_H

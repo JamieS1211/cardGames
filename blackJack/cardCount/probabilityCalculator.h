@@ -19,15 +19,14 @@ void calculateProbabilities(DeckStack *deckStackPointer, BlackJackPlayer *blackJ
  * @param blackJackPlayerPointer
  * @param blackJackDealerPointer
  */
-int stand(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer);
-
+int origonalStand(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer);
 /**
  * A function that returns 1 if should stand and 0 if should hit
  * @param simpleStackPointer
  * @param blackJackPlayerPointer
  * @param blackJackDealerPointer
  */
-int standSimpleStack(SimpleStack *simpleStackPointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer);
+int optimisedStand(SimpleStack *simpleStackPointer, ProbabilityTree *probabilityTreePointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer);
 
 /**
  * A function that returns the expected value of the next hand

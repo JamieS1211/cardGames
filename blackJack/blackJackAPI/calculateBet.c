@@ -26,6 +26,7 @@ float calculateBet(float expectedValue, float minBet, float maxBet, float curren
 }
 
 float standardBetExpectedValue(float expectedValue, float minBet) {
+    return minBet;
     float trueCount = (expectedValue * 2) + 1;
 
     return (trueCount - 1) * minBet;

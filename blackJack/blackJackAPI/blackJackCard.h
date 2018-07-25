@@ -15,11 +15,11 @@ int getCardValue(Card card);
 /**
  * A function to deal a random card to a black jack player
  * @param deckStackPointer                  Pointer to the deck stack to deal from
- * @param usedDeckStackPointer              Pointer to the deck stack of used cards to shuffle from if needed
+ * @param simpleDeckStackPointer            Pointer to the simple form of the deck stack to deal from
  * @param blackJackPlayerPointer            Pointer to the black jack player to deal to
  * @param silent                            Should this be done silently without printing output
  */
-void dealBlackJack(DeckStack *deckStackPointer, DeckStack *usedDeckStackPointer, BlackJackPlayer *blackJackPlayerPointer, int silent);
+void dealBlackJack(DeckStack *deckStackPointer, SimpleStack *simpleDeckStackPointer, BlackJackPlayer *blackJackPlayerPointer, int silent);
 
 /**
  * A function to specified card to a black jack player

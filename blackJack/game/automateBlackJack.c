@@ -16,8 +16,10 @@
 #include "../../cardAPI/deckStack.h"
 #include "../../cardAPI/player.h"
 #include "../blackJackAPI/calculateBet.h"
+#include "../../cardAPI/simpleStack.h"
 
-void automateBlackJack(int gamesSets, int gamesPerSet, float startBalance, float minBet, float maxBet, float riskFactor) {clock_t start, end;
+void automateBlackJack(int gamesSets, int gamesPerSet, float startBalance, float minBet, float maxBet, float riskFactor) {
+    clock_t start, end;
     double runTime;
 
     start = clock();
@@ -27,54 +29,33 @@ void automateBlackJack(int gamesSets, int gamesPerSet, float startBalance, float
     float percentRemainingForShuffle = 20;
     int cardShuffleThreshold = (DECKSUSED * NUMBER_OF_SUITS * NUMBER_OF_CARDS) * percentRemainingForShuffle / 100;
 
+    ProbabilityTree probabilityTree;
+
+    probabilityTree.tree = NULL;
+    probabilityTree.tree = malloc(LAYERSTOCALCULATE * POSSIBLESCORES * sizeof(Probability));
+
+    for (int layer = 0; layer < LAYERSTOCALCULATE; layer++) {
+        probabilityTree.tree[layer] = malloc(POSSIBLESCORES * sizeof(Probability));
+    }
+
     for (int set = 0; set < gamesSets; set++) {
 
         DeckStack deckStack;
         initialiseFullDeckStack(&deckStack, DECKSUSED);
 
+        SimpleStack simpleDeckStack;
+        initialiseSimpleStackFromDeckStack(&simpleDeckStack, &deckStack);
+
+        // Simplify all 10 score cards into one slot
+        for (int i = JACK; i <= KING; i++) {
+            while (simpleDeckStack.cardsCountsInStack[i] > 0) {
+                simpleDeckStack.cardsCountsInStack[10]++;
+                simpleDeckStack.cardsCountsInStack[i]--;
+            }
+        }
+
         DeckStack usedDeckStack;
         initialiseEmptyDeckStack(&usedDeckStack, DECKSUSED);
-
-/* Testing code to test efficiency of new code
-
-
-        int totalShuffles = 500000;
-
-
-        clock_t start, end;
-        double runTime;
-
-        start = clock();
-        for (int i = 0; i < totalShuffles; i++) {
-
-            for (int i = 0; i < deckStack.cardsLeft; i++) {
-                addCardToDeckStack(&usedDeckStack, getCardFromDeckStack(&deckStack, i));
-                removeCardFromDeckStack(&deckStack, i);
-            }
-
-            for (int i = 0; i < usedDeckStack.cardsLeft; i++) {
-                addCardToDeckStack(&deckStack, getCardFromDeckStack(&usedDeckStack, i));
-                removeCardFromDeckStack(&usedDeckStack, i);
-            }
-        }
-
-
-        end = clock();
-        runTime = (end - start) / (double) CLOCKS_PER_SEC;
-        printf("Completed old code in %g seconds\n", runTime);
-
-
-        start = clock();
-        for (int i = 0; i < totalShuffles; i++) {
-            moveAllDeckStackContents(&deckStack, &usedDeckStack);
-            moveAllDeckStackContents(&usedDeckStack, &deckStack);
-        }
-
-        end = clock();
-        runTime = (end - start) / (double) CLOCKS_PER_SEC;
-        printf("Completed new code in %g seconds\n", runTime);
-
-        return;*/
 
         BlackJackPlayer player;
         initialiseBlackJackPlayer(&player, "Player");
@@ -92,34 +73,28 @@ void automateBlackJack(int gamesSets, int gamesPerSet, float startBalance, float
             if (balance >= minBet) {
 
                 if (deckStack.cardsLeft < cardShuffleThreshold) {
-                    //New method
                     moveAllDeckStackContents(&usedDeckStack, &deckStack);
-
-                    //Old method
-                    //for (int i = 0; i < usedDeckStack.cardsLeft; i++) {
-                    //    addCardToDeckStack(&deckStack, getCardFromDeckStack(&usedDeckStack, i));
-                    //    removeCardFromDeckStack(&usedDeckStack, i);
-                    //}
+                    initialiseSimpleStackFromDeckStack(&simpleDeckStack, &deckStack);
                 }
 
 
                 float expectedValue = getExpectedValueOfNextHandRunningCount(&deckStack);
-                //float expectedValueReal = getExpectedValueOfNextHandReal(&deckStack, &player, &dealer);
                 float bet = standardBetExpectedValue(expectedValue, minBet);
 
-                dealBlackJack(&deckStack, &usedDeckStack, &player, 1);
-                dealBlackJack(&deckStack, &usedDeckStack, &player, 1);
-                dealBlackJack(&deckStack, &usedDeckStack, &dealer, 1);
+                dealBlackJack(&deckStack, &simpleDeckStack, &player, 1);
+                dealBlackJack(&deckStack, &simpleDeckStack, &player, 1);
+                dealBlackJack(&deckStack, &simpleDeckStack, &dealer, 1);
 
                 int playerBust = 0;
                 int dealerBust = 0;
 
                 while (!playerBust && !doesPlayerHaveBlackJack(&player)) {
 
-                    if (stand(&deckStack, &player, &dealer)) {
+                    if (optimisedStand(&simpleDeckStack, &probabilityTree, &player, &dealer)) {
+                    //if (origonalStand(&deckStack, &player, &dealer)) {
                         break;
                     } else {
-                        dealBlackJack(&deckStack, &usedDeckStack, &player, 1);
+                        dealBlackJack(&deckStack, &simpleDeckStack, &player, 1);
                         if (player.score > 21) {
                             playerBust = 1;
                         }
@@ -128,7 +103,7 @@ void automateBlackJack(int gamesSets, int gamesPerSet, float startBalance, float
 
                 if (!playerBust && !doesPlayerHaveBlackJack(&player)) {
                     while (dealer.score < 17) {
-                        dealBlackJack(&deckStack, &usedDeckStack, &dealer, 1);
+                        dealBlackJack(&deckStack, &simpleDeckStack, &dealer, 1);
                     }
 
                     if (dealer.score > 21) {
@@ -191,6 +166,11 @@ void automateBlackJack(int gamesSets, int gamesPerSet, float startBalance, float
     }
 
     printf("\n\n");
+
+    for (int layer = 0; layer < LAYERSTOCALCULATE; layer++) {
+        free(probabilityTree.tree[layer]);
+    }
+    free(probabilityTree.tree);
 
 
     end = clock();

@@ -2,11 +2,9 @@
 // Created by Jamie on 28/12/2017.
 //
 
-int layersToCalculate = 2;
-int possibleScores = 23;
-
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "../blackJackAPI/blackJack.h"
 #include "../../cardAPI/simpleStack.h"
 #include "../blackJackAPI/blackJackPlayer.h"
@@ -14,18 +12,18 @@ int possibleScores = 23;
 
 void printProbabilities(Probability **treePointer) {
 
-    float cumulativeWin[layersToCalculate];
-    float cumulativeDraw[layersToCalculate];
-    float cumulativeLose[layersToCalculate];
+    float cumulativeWin[LAYERSTOCALCULATE];
+    float cumulativeDraw[LAYERSTOCALCULATE];
+    float cumulativeLose[LAYERSTOCALCULATE];
 
-    for (int layer = 0; layer < layersToCalculate; layer++) {
+    for (int layer = 0; layer < LAYERSTOCALCULATE; layer++) {
         int totalWays = 0;
 
         cumulativeWin[layer] = 0;
         cumulativeDraw[layer] = 0;
         cumulativeLose[layer] = 0;
 
-        for (int score = 0; score < possibleScores; score++) {
+        for (int score = 0; score < POSSIBLESCORES; score++) {
             totalWays += treePointer[layer][score].waysToAchieveScore;
         }
 
@@ -37,7 +35,7 @@ void printProbabilities(Probability **treePointer) {
         printf("\t\t\t Draw");
         printf("\t\t\t Lose \n");
 
-        for (int score = 0; score < possibleScores; score++) {
+        for (int score = 0; score < POSSIBLESCORES; score++) {
 
             if (treePointer[layer][score].waysToAchieveScore > 0) {
                 if (score <= 21) {
@@ -77,18 +75,6 @@ void printProbabilities(Probability **treePointer) {
 
         printf("\nCumulative probability:\t\t\t %f%%\t\t %f%%\t\t %f%% \n", cumulativeWin[layer], cumulativeDraw[layer], cumulativeLose[layer]);
     }
-
-    float lowestLose = 100;
-    int bestChance = 0;
-    //TODO when is the probability improvement worth the risk of going bust from hitting?
-    for (int layer = 0; layer < layersToCalculate; layer++) {
-        if (cumulativeLose[layer] < lowestLose) {
-            lowestLose = cumulativeLose[layer];
-            bestChance = layer;
-        }
-    }
-
-    printf("\n\n\nTo minimise your chance of losing you should hit %i times \n\n", bestChance);
 }
 
 // A function that takes a player and dealer state and updates a probability tree with chance player wins / losses / draws with dealer provided player stands at this point
@@ -196,15 +182,15 @@ void calculateProbabilities(DeckStack *deckStackPointer, BlackJackPlayer *blackJ
 
     Probability **tree = NULL;
 
-    tree = malloc(layersToCalculate * possibleScores * sizeof(Probability));
+    tree = malloc(LAYERSTOCALCULATE * POSSIBLESCORES * sizeof(Probability));
 
-    for (int layer = 0; layer < layersToCalculate; layer++) {
-        tree[layer] = malloc(possibleScores * sizeof(Probability));
+    for (int layer = 0; layer < LAYERSTOCALCULATE; layer++) {
+        tree[layer] = malloc(POSSIBLESCORES * sizeof(Probability));
     }
 
 
-    for (int layer = 0; layer < layersToCalculate; layer++) {
-        for (int score = 0; score < possibleScores; score++) {
+    for (int layer = 0; layer < LAYERSTOCALCULATE; layer++) {
+        for (int score = 0; score < POSSIBLESCORES; score++) {
             tree[layer][score].waysToAchieveScore = 0;
             tree[layer][score].waysWithScoreToWin = 0;
             tree[layer][score].waysWithScoreToDraw = 0;
@@ -212,12 +198,12 @@ void calculateProbabilities(DeckStack *deckStackPointer, BlackJackPlayer *blackJ
         }
     }
 
-    calculatePlayerHitScores(&simpleStack, blackJackPlayerPointer, blackJackDealerPointer, tree, 0, 1, layersToCalculate);
+    calculatePlayerHitScores(&simpleStack, blackJackPlayerPointer, blackJackDealerPointer, tree, 0, 1, LAYERSTOCALCULATE);
     updatePlayersScore(blackJackPlayerPointer);
     updatePlayersScore(blackJackDealerPointer);
 
     printProbabilities(tree);
-    for (int layer = 0; layer < layersToCalculate; layer++) {
+    for (int layer = 0; layer < LAYERSTOCALCULATE; layer++) {
         free(tree[layer]);
     }
     free(tree);
@@ -225,19 +211,23 @@ void calculateProbabilities(DeckStack *deckStackPointer, BlackJackPlayer *blackJ
 
 /**
  * A function that returns 1 if should stand and 0 if should hit
- * @param simpleStackPointer
+ * @param deckStackPointer
  * @param blackJackPlayerPointer
  * @param blackJackDealerPointer
  */
-int standSimpleStack(SimpleStack *simpleStackPointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer) {
-    int localLayersToCalculate = 2; //TODO this value is amount of iterations deep that is relevent for calculations. Higher = better but longer
+int origonalStand(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer) {
 
+    SimpleStack simpleStack;
+    initialiseSimpleStackFromDeckStack(&simpleStack, deckStackPointer);
+
+    int localLayersToCalculate = 2; //TODO this value is amount of iterations deep that is relevent for calculations. Higher = better but longer
+    int possibleScores = POSSIBLESCORES;
 
     // Simplify all 10 score cards into one slot
     for (int i = JACK; i <= KING; i++) {
-        while (simpleStackPointer->cardsCountsInStack[i] > 0) {
-            simpleStackPointer->cardsCountsInStack[10]++;
-            simpleStackPointer->cardsCountsInStack[i]--;
+        while (simpleStack.cardsCountsInStack[i] > 0) {
+            simpleStack.cardsCountsInStack[10]++;
+            simpleStack.cardsCountsInStack[i]--;
         }
     }
 
@@ -259,20 +249,19 @@ int standSimpleStack(SimpleStack *simpleStackPointer, BlackJackPlayer *blackJack
         }
     }
 
-    calculatePlayerHitScores(simpleStackPointer, blackJackPlayerPointer, blackJackDealerPointer, tree, 0, 1, localLayersToCalculate);
+    calculatePlayerHitScores(&simpleStack, blackJackPlayerPointer, blackJackDealerPointer, tree, 0, 1, localLayersToCalculate);
+
     updatePlayersScore(blackJackPlayerPointer);
     updatePlayersScore(blackJackDealerPointer);
 
 
-    float cumulativeWin[localLayersToCalculate];
-    float cumulativeDraw[localLayersToCalculate];
     float cumulativeLose[localLayersToCalculate];
+    float lowestLose = 100;
+    int bestChance = 0;
 
     for (int layer = 0; layer < localLayersToCalculate; layer++) {
         int totalWays = 0;
 
-        cumulativeWin[layer] = 0;
-        cumulativeDraw[layer] = 0;
         cumulativeLose[layer] = 0;
 
         for (int score = 0; score < possibleScores; score++) {
@@ -290,27 +279,14 @@ int standSimpleStack(SimpleStack *simpleStackPointer, BlackJackPlayer *blackJack
                                           + tree[layer][score].waysWithScoreToLoose;
 
                 float percentOfGettingScore = ((float) tree[layer][score].waysToAchieveScore / totalWays) * 100;
-                float percentOfWin =
-                        ((float) tree[layer][score].waysWithScoreToWin / totalWaysForDealerPlay) * 100;
-                float percentOfDraw =
-                        ((float) tree[layer][score].waysWithScoreToDraw / totalWaysForDealerPlay) * 100;
-                float percentOfLose =
-                        ((float) tree[layer][score].waysWithScoreToLoose / totalWaysForDealerPlay) * 100;
+                float percentOfLose = ((float) tree[layer][score].waysWithScoreToLoose / totalWaysForDealerPlay) * 100;
 
-                cumulativeWin[layer] += percentOfGettingScore * percentOfWin;
-                cumulativeDraw[layer] += percentOfGettingScore * percentOfDraw;
                 cumulativeLose[layer] += percentOfGettingScore * percentOfLose;
             }
         }
 
-        cumulativeWin[layer] /= 100;
-        cumulativeDraw[layer] /= 100;
         cumulativeLose[layer] /= 100;
-    }
 
-    float lowestLose = 100;
-    int bestChance = 0;
-    for (int layer = 0; layer < localLayersToCalculate; layer++) {
         if (cumulativeLose[layer] < lowestLose) {
             lowestLose = cumulativeLose[layer];
             bestChance = layer;
@@ -327,16 +303,71 @@ int standSimpleStack(SimpleStack *simpleStackPointer, BlackJackPlayer *blackJack
 
 /**
  * A function that returns 1 if should stand and 0 if should hit
- * @param deckStackPointer
+ * @param simpleStackPointer
  * @param blackJackPlayerPointer
  * @param blackJackDealerPointer
  */
-int stand(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer) {
+int optimisedStand(SimpleStack *simpleStackPointer, ProbabilityTree *probabilityTreePointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer) {
+    /*
+     * This value is amount of iterations deep that is relevant for calculations. Higher = better but longer
+     * Value of 2 assesses current layer (standing) against next layer (hitting)
+     * As cumulative odds of losing decrease to a point and then increase (AKA have one minimum) only 2 values are required
+     * If next layer has higher cumulative chance of losing then we should stand
+    */
+    int localLayersToCalculate = 2;
+    int possibleScores = POSSIBLESCORES;
 
-    SimpleStack simpleStack;
-    initialiseSimpleStackFromDeckStack(&simpleStack, deckStackPointer);
+    for (int layer = 0; layer < localLayersToCalculate; layer++) {
+        for (int score = 0; score < possibleScores; score++) {
+            probabilityTreePointer->tree[layer][score].waysToAchieveScore = 0;
+            probabilityTreePointer->tree[layer][score].waysWithScoreToWin = 0;
+            probabilityTreePointer->tree[layer][score].waysWithScoreToDraw = 0;
+            probabilityTreePointer->tree[layer][score].waysWithScoreToLoose = 0;
+        }
+    }
 
-    return standSimpleStack(&simpleStack, blackJackPlayerPointer, blackJackDealerPointer);
+    calculatePlayerHitScores(simpleStackPointer, blackJackPlayerPointer, blackJackDealerPointer, probabilityTreePointer->tree, 0, 1, localLayersToCalculate);
+
+    updatePlayersScore(blackJackPlayerPointer);
+    updatePlayersScore(blackJackDealerPointer);
+
+    float cumulativeLose[localLayersToCalculate];
+
+    int bestChance;
+    float lowestCumulativeLose = 100;
+
+    for (int layer = 0; layer < localLayersToCalculate; layer++) {
+        int totalWays = 0;
+
+        cumulativeLose[layer] = 0;
+
+        for (int score = 0; score < possibleScores; score++) {
+            totalWays += probabilityTreePointer->tree[layer][score].waysToAchieveScore;
+        }
+
+        for (int score = 0; score < possibleScores; score++) {
+
+            if (probabilityTreePointer->tree[layer][score].waysToAchieveScore > 0) {
+                int totalWaysForDealerPlay = 0;
+
+                totalWaysForDealerPlay += probabilityTreePointer->tree[layer][score].waysWithScoreToWin + probabilityTreePointer->tree[layer][score].waysWithScoreToDraw + probabilityTreePointer->tree[layer][score].waysWithScoreToLoose;
+
+                float percentOfGettingScore = ((float) probabilityTreePointer->tree[layer][score].waysToAchieveScore / totalWays) * 100;
+                float percentOfLose = ((float) probabilityTreePointer->tree[layer][score].waysWithScoreToLoose / totalWaysForDealerPlay) * 100;
+
+                cumulativeLose[layer] += percentOfGettingScore * percentOfLose;
+            }
+        }
+
+        cumulativeLose[layer] /= 100;
+
+        if (cumulativeLose[layer] < lowestCumulativeLose) {
+            bestChance = layer;
+            lowestCumulativeLose = cumulativeLose[layer];
+        }
+    }
+
+    return bestChance == 0;
 }
 
 float getExpectedValueOfNextHandRunningCount(DeckStack *deckStackPointer) {
