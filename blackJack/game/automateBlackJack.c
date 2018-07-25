@@ -90,8 +90,7 @@ void automateBlackJack(int gamesSets, int gamesPerSet, float startBalance, float
 
                 while (!playerBust && !doesPlayerHaveBlackJack(&player)) {
 
-                    if (optimisedStand(&simpleDeckStack, &probabilityTree, &player, &dealer)) {
-                    //if (origonalStand(&deckStack, &player, &dealer)) {
+                    if (shouldStand(&deckStack, &simpleDeckStack, &probabilityTree, &player, &dealer)) {
                         break;
                     } else {
                         dealBlackJack(&deckStack, &simpleDeckStack, &player, 1);
