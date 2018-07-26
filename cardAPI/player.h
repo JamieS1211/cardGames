@@ -7,11 +7,18 @@
 #define CARDAPI_PLAYER_H
 
 /**
- * A function to initialise a player with a given name
- * @param playerPointer        Pointer to the player
- * @param name          Name of the player
+ * A function to initialise a player with a given name and no memory to hold cards in hand
+ * @param playerPointer         Pointer to the player
+ * @param name                  Name of the player
  */
-void initialisePlayer(Player *playerPointer, char name[120]);
+void initialisePlayerNoMemory(Player *playerPointer, char *name);
+
+/**
+ * A function to initialise a player with a given name and specified memory to hold cards in hand
+ * @param playerPointer         Pointer to the player
+ * @param name                  Name of the player
+ */
+void initialisePlayerSpecifiedMemory(Player *playerPointer, int maxCards, char *name);
 
 /**
  * A function to return the card at that position in the given players hand
@@ -26,7 +33,21 @@ Card getCardFromPlayer(Player *playerPointer, int position);
  * @param playerPointer        Pointer to the player
  * @param card          Pointer to the card
  */
-void addCardToPlayer(Player *playerPointer, Card card);
+void addCardToPlayerDynamicMemory(Player *playerPointer, Card card);
+
+/**
+ * A function to add a card to a players hand (WARNING STATIC MEMORY FUNCTION USE WITH CARE)
+ * @param playerPointer        Pointer to the player
+ * @param card          Pointer to the card
+ */
+void addCardToPlayerStaticMemory(Player *playerPointer, Card card);
+
+/**
+ * A function to add a card to a players hand
+ * @param playerPointer        Pointer to the player
+ * @param card          Pointer to the card
+ */
+void addCardToPlayerStaticMemory(Player *playerPointer, Card card);
 
 /**
  * A function to return the position (first if multiple) of the given card in the given players hand
@@ -42,7 +63,14 @@ int findPositionOfPlayersCard(Player *playerPointer, Card card);
 * @param playerPointer                 Pointer to the player
 * @param position               Position of card
 */
-void removeCardFromPlayersHand(Player *playerPointer, int position);
+void removeCardFromPlayersHandDynamicMemory(Player *playerPointer, int position);
+
+/**
+* A function to remove a card from a given position from the players hand (WARNING STATIC MEMORY FUNCTION USE WITH CARE)
+* @param playerPointer                 Pointer to the player
+* @param position               Position of card
+*/
+void removeCardFromPlayersHandStaticMemory(Player *playerPointer, int position);
 
 /**
  * A function to print out all the cards that a player has

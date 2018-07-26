@@ -25,9 +25,17 @@ float calculateBet(float expectedValue, float minBet, float maxBet, float curren
     return bet;
 }
 
-float standardBetExpectedValue(float expectedValue, float minBet) {
-    return minBet;
-    float trueCount = (expectedValue * 2) + 1;
+float standardBetExpectedValue(float trueCount, float minBet, float maxBet) {
 
-    return (trueCount - 1) * minBet;
+    float bet = (trueCount - 1) * minBet;
+
+    if (bet < minBet) {
+        bet = minBet;
+    }
+
+    if (bet > maxBet) {
+        bet = maxBet;
+    }
+
+    return bet;
 }

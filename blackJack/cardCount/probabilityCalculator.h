@@ -26,7 +26,7 @@ int shouldStand(DeckStack *deckStackPointer, SimpleStack *simpleStackPointer, Pr
  * @param deckStackPointer
  * @return
  */
-float getExpectedValueOfNextHandRunningCount(DeckStack *deckStackPointer);
+float getTrueCount(DeckStack *deckStackPointer);
 
 
 float getExpectedValueOfNextHandReal(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer,

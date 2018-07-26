@@ -78,8 +78,7 @@ void automateBlackJack(int gamesSets, int gamesPerSet, float startBalance, float
                 }
 
 
-                float expectedValue = getExpectedValueOfNextHandRunningCount(&deckStack);
-                float bet = standardBetExpectedValue(expectedValue, minBet);
+                float bet = standardBetExpectedValue(getTrueCount(&deckStack), minBet, maxBet);
 
                 dealBlackJack(&deckStack, &simpleDeckStack, &player, 1);
                 dealBlackJack(&deckStack, &simpleDeckStack, &player, 1);

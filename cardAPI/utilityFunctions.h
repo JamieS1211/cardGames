@@ -26,7 +26,16 @@ void getCardName(char *cardNamePointer, Card card);
  * @param playerPointer        Player to deal card to
  * @return              Card that was dealt to player
  */
-Card dealCard(DeckStack *stackPointer, Player *playerPointer);
+Card dealCardDynamicMemory(DeckStack *stackPointer, Player *playerPointer);
+
+/**
+ * A function that takes a stack of cards and a player and deals a random card from that stack to the player returning the card that was dealt (WARNING STATIC MEMORY FUNCTION USE WITH CARE)
+ *
+ * @param stackPointer          Stack of cards to deal from
+ * @param playerPointer         Player to deal card to
+ * @return                      Card that was dealt to player
+ */
+Card dealCardStaticMemory(DeckStack *stackPointer, Player *playerPointer);
 
 /**
  * A function to request user input for a specific card

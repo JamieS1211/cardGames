@@ -248,7 +248,7 @@ int shouldStand(DeckStack *deckStackPointer, SimpleStack *simpleStackPointer, Pr
     }
 
     //TODO work out why using simple stack pointer takes longer
-    calculatePlayerHitScores(simpleStackPointer, blackJackPlayerPointer, blackJackDealerPointer, probabilityTreePointer->tree, 0, 1, localLayersToCalculate);
+    calculatePlayerHitScores(&simpleStack, blackJackPlayerPointer, blackJackDealerPointer, probabilityTreePointer->tree, 0, 1, localLayersToCalculate);
 
     updatePlayersScore(blackJackPlayerPointer);
     updatePlayersScore(blackJackDealerPointer);
@@ -294,7 +294,7 @@ int shouldStand(DeckStack *deckStackPointer, SimpleStack *simpleStackPointer, Pr
     return bestChance == 0;
 }
 
-float getExpectedValueOfNextHandRunningCount(DeckStack *deckStackPointer) {
+float getTrueCount(DeckStack *deckStackPointer) {
     float runningCount = 0;
 
     for (int i = 0; i < deckStackPointer->cardsLeft; i++) {
@@ -319,6 +319,11 @@ float getExpectedValueOfNextHandRunningCount(DeckStack *deckStackPointer) {
     float decksLeft = (float) deckStackPointer->cardsLeft / 52;
     float trueCount = runningCount / decksLeft;
 
+    return trueCount;
+}
+
+float getExpectedValueOfNextHandReal(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer,
+                                     BlackJackPlayer *blackJackDealerPointer) {
     /* Expectation
      * Can be +tive or - tive
      * Represents decimal percent of bet you expect to win by betting
@@ -327,13 +332,6 @@ float getExpectedValueOfNextHandRunningCount(DeckStack *deckStackPointer) {
      * This is given by:
      * (chance of winning * value of winning) - (chance of losing * value of losing)
     */
-    float expectation = (trueCount - 1) / 2;
-
-    return expectation;
-}
-
-float getExpectedValueOfNextHandReal(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer,
-                                     BlackJackPlayer *blackJackDealerPointer) {
 
     SimpleStack simpleStack;
     initialiseSimpleStackFromDeckStack(&simpleStack, deckStackPointer);
@@ -370,7 +368,7 @@ float getExpectedValueOfNextHandReal(DeckStack *deckStackPointer, BlackJackPlaye
             simpleStack.cardsLeft--;
 
             firstCard.cardID = i;
-            addCardToPlayer(&blackJackPlayerPointer->player, firstCard);
+            addCardToPlayerDynamicMemory(&blackJackPlayerPointer->player, firstCard);
 
             for (int j = i; j < 10; j++) {
                 // Deal 2nd card to player
@@ -380,7 +378,7 @@ float getExpectedValueOfNextHandReal(DeckStack *deckStackPointer, BlackJackPlaye
                     simpleStack.cardsLeft--;
 
                     secondCard.cardID = j;
-                    addCardToPlayer(&blackJackPlayerPointer->player, secondCard);
+                    addCardToPlayerDynamicMemory(&blackJackPlayerPointer->player, secondCard);
 
                     if (i != j) {
                         weight *= 2; //Corrects weights for occurrences that can happen in 2 ways
@@ -397,7 +395,7 @@ float getExpectedValueOfNextHandReal(DeckStack *deckStackPointer, BlackJackPlaye
                             simpleStack.cardsLeft--;
 
                             thirdCard.cardID = k;
-                            addCardToPlayer(&blackJackDealerPointer->player, thirdCard);
+                            addCardToPlayerDynamicMemory(&blackJackDealerPointer->player, thirdCard);
                             updatePlayersScore(blackJackDealerPointer);
 
                             // Dealt first 3 cards

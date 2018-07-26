@@ -84,7 +84,7 @@ int main() {
         } else if (option == 2) {
             cardCountBlackJack();
         } else if (option == 3) {
-            int gameSets = 1;
+            int gameSets = 10;
             int gamesPerSet = 1000;
 
             float startBalance = 10000;

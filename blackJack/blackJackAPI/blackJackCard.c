@@ -42,7 +42,7 @@ void dealBlackJack(DeckStack *deckStackPointer, SimpleStack *simpleDeckStackPoin
         return;
     }
 
-    Card card = dealCard(deckStackPointer, &blackJackPlayerPointer->player);
+    Card card = dealCardStaticMemory(deckStackPointer, &blackJackPlayerPointer->player);
     updatePlayersScore(blackJackPlayerPointer);
 
     simpleDeckStackPointer->cardsLeft--;
@@ -87,7 +87,7 @@ void giveBlackJackPlayerCard(DeckStack *deckStackPointer, DeckStack *usedDeckSta
     }
 
     removeCardFromDeckStack(deckStackPointer, findPositionOfDeckStacksCard(deckStackPointer, card));
-    addCardToPlayer(&blackJackPlayerPointer->player, card);
+    addCardToPlayerStaticMemory(&blackJackPlayerPointer->player, card);
     updatePlayersScore(blackJackPlayerPointer);
 
     char suit[120] = "";

@@ -13,12 +13,12 @@
 #include "../../cardAPI/utilityFunctions.h"
 
 /**
- * A function to initialise a black jack player with a given name
+ * A function to initialise a black jack player with a given name with enough memory to hold all cards in BlackJack game
  * @param blackJackPlayerPointer        Pointer to the black jack player
  * @param name                          Name of the black jack player
  */
 void initialiseBlackJackPlayer(BlackJackPlayer *blackJackPlayerPointer, char name[120]) {
-    initialisePlayer(&blackJackPlayerPointer->player, name);
+    initialisePlayerSpecifiedMemory(&blackJackPlayerPointer->player, DECKSUSED * NUMBER_OF_SUITS * NUMBER_OF_CARDS, name);
 
     blackJackPlayerPointer->score = 0;
     blackJackPlayerPointer->isScoreSoft = 0;
@@ -64,7 +64,7 @@ void updatePlayersScore(BlackJackPlayer *blackJackPlayerPointer) {
  * @param updateScore                   If the players score should be updated
  */
 void removeCardFromBlackJackPlayersHand(BlackJackPlayer *blackJackPlayerPointer, int position, int updateScore) {
-    removeCardFromPlayersHand(&blackJackPlayerPointer->player, position);
+    removeCardFromPlayersHandStaticMemory(&blackJackPlayerPointer->player, position);
 
     if (updateScore) {
         updatePlayersScore(blackJackPlayerPointer);
@@ -91,7 +91,7 @@ void moveCardFromSimpleStackToBlackJackPlayer(SimpleStack *simpleStackPointer, i
     card.cardID = cardID;
     card.cardSuit = 0; //Place holder not used
 
-    addCardToPlayer(&blackJackPlayerPointer->player, card);
+    addCardToPlayerStaticMemory(&blackJackPlayerPointer->player, card);
     simpleStackPointer->cardsCountsInStack[cardID]--;
     simpleStackPointer->cardsLeft--;
 }
@@ -105,5 +105,6 @@ void moveLastCardFromBlackJackPlayerToSimpleStack(SimpleStack *simpleStackPointe
     Card card = getCardFromPlayer(&blackJackPlayerPointer->player, blackJackPlayerPointer->player.cardsInHand - 1);
     simpleStackPointer->cardsCountsInStack[card.cardID]++;
     simpleStackPointer->cardsLeft++;
-    removeCardFromPlayersHand(&blackJackPlayerPointer->player, blackJackPlayerPointer->player.cardsInHand - 1);
+    removeCardFromPlayersHandStaticMemory(&blackJackPlayerPointer->player,
+                                           blackJackPlayerPointer->player.cardsInHand - 1);
 }
