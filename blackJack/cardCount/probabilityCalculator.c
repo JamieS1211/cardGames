@@ -135,13 +135,15 @@ void calculateChanceOfWin(SimpleStack *simpleStackPointer, BlackJackPlayer *blac
 // A recursive function that builds up a pobability tree showing probabilities of outcomes
 
 void calculatePlayerHitScores(SimpleStack *simpleStackPointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer, Probability **treePointer, int currentLayer, int weight, int totalLayers) {
+    //TODO optimise function to only do each order of cards once
+
     int currentBestPlayerScore = blackJackPlayerPointer->score;
     int nextLayer = currentLayer + 1;
 
     if (currentBestPlayerScore > 21) {
         currentBestPlayerScore = 22;
     } else if (currentBestPlayerScore <= 21 && nextLayer < totalLayers) {
-        for (int cardID = 1; cardID <= NUMBER_OF_CARDS ; cardID++) {
+        for (int cardID = 1; cardID <= TEN ; cardID++) {
             if (simpleStackPointer->cardsCountsInStack[cardID] > 0) {
                 weight *= simpleStackPointer->cardsCountsInStack[cardID];
 
@@ -210,12 +212,12 @@ void calculateProbabilities(DeckStack *deckStackPointer, BlackJackPlayer *blackJ
 }
 
 /**
- * A function that returns 1 if should stand and 0 if should hit
+ * A function that returns a current chances object that advises if a player should stand and what their current win and lose chances are
  * @param deckStackPointer
  * @param blackJackPlayerPointer
  * @param blackJackDealerPointer
  */
-int shouldStand(DeckStack *deckStackPointer, SimpleStack *simpleStackPointer, ProbabilityTree *probabilityTreePointer,
+CurrentChances shouldStand(DeckStack *deckStackPointer, SimpleStack *simpleStackPointer, ProbabilityTree *probabilityTreePointer,
                 BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer) {
     /*
      * This value is amount of iterations deep that is relevant for calculations. Higher = better but longer
@@ -253,13 +255,17 @@ int shouldStand(DeckStack *deckStackPointer, SimpleStack *simpleStackPointer, Pr
     updatePlayersScore(blackJackPlayerPointer);
     updatePlayersScore(blackJackDealerPointer);
 
+    CurrentChances currentChances;
+    float cumulativeWin[localLayersToCalculate];
     float cumulativeLose[localLayersToCalculate];
+
     float lowestLose = 100;
     int bestChance = 0;
 
     for (int layer = 0; layer < localLayersToCalculate; layer++) {
         int totalWays = 0;
 
+        cumulativeWin[layer] = 0;
         cumulativeLose[layer] = 0;
 
         for (int score = 0; score < possibleScores; score++) {
@@ -277,12 +283,15 @@ int shouldStand(DeckStack *deckStackPointer, SimpleStack *simpleStackPointer, Pr
                                           + probabilityTreePointer->tree[layer][score].waysWithScoreToLoose;
 
                 float percentOfGettingScore = ((float) probabilityTreePointer->tree[layer][score].waysToAchieveScore / totalWays) * 100;
+                float percentOfWin = ((float) probabilityTreePointer->tree[layer][score].waysWithScoreToWin / totalWaysForDealerPlay) * 100;
                 float percentOfLose = ((float) probabilityTreePointer->tree[layer][score].waysWithScoreToLoose / totalWaysForDealerPlay) * 100;
 
+                cumulativeWin[layer] += percentOfGettingScore * percentOfWin;
                 cumulativeLose[layer] += percentOfGettingScore * percentOfLose;
             }
         }
 
+        cumulativeWin[layer] /= 100;
         cumulativeLose[layer] /= 100;
 
         if (cumulativeLose[layer] < lowestLose) {
@@ -291,7 +300,11 @@ int shouldStand(DeckStack *deckStackPointer, SimpleStack *simpleStackPointer, Pr
         }
     }
 
-    return bestChance == 0;
+    currentChances.shouldStand = (bestChance == 0);
+    currentChances.currentCumulativeWin = cumulativeWin[0];
+    currentChances.currentCumulativeLose = cumulativeLose[0];
+
+    return currentChances;
 }
 
 float getTrueCount(DeckStack *deckStackPointer) {
@@ -322,8 +335,7 @@ float getTrueCount(DeckStack *deckStackPointer) {
     return trueCount;
 }
 
-float getExpectedValueOfNextHandReal(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer,
-                                     BlackJackPlayer *blackJackDealerPointer) {
+float getExpectedValueOfNextHand(DeckStack *deckStackPointer, ProbabilityTree *probabilityTreePointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer) {
     /* Expectation
      * Can be +tive or - tive
      * Represents decimal percent of bet you expect to win by betting
@@ -348,6 +360,9 @@ float getExpectedValueOfNextHandReal(DeckStack *deckStackPointer, BlackJackPlaye
     float totalDraw = 0;
     float totalLose = 0;
 
+    CurrentChances currentChances;
+    int totalStartingHands =
+            deckStackPointer->cardsLeft * (deckStackPointer->cardsLeft - 1) * (deckStackPointer->cardsLeft - 2);
     int weight = 1;
 
 
@@ -368,7 +383,7 @@ float getExpectedValueOfNextHandReal(DeckStack *deckStackPointer, BlackJackPlaye
             simpleStack.cardsLeft--;
 
             firstCard.cardID = i;
-            addCardToPlayerDynamicMemory(&blackJackPlayerPointer->player, firstCard);
+            addCardToPlayerStaticMemory(&blackJackPlayerPointer->player, firstCard);
 
             for (int j = i; j < 10; j++) {
                 // Deal 2nd card to player
@@ -378,9 +393,10 @@ float getExpectedValueOfNextHandReal(DeckStack *deckStackPointer, BlackJackPlaye
                     simpleStack.cardsLeft--;
 
                     secondCard.cardID = j;
-                    addCardToPlayerDynamicMemory(&blackJackPlayerPointer->player, secondCard);
+                    addCardToPlayerStaticMemory(&blackJackPlayerPointer->player, secondCard);
 
                     if (i != j) {
+                        //Only do in ascending order, total ways to organise is factorial of different cards
                         weight *= 2; //Corrects weights for occurrences that can happen in 2 ways
                     }
 
@@ -395,18 +411,106 @@ float getExpectedValueOfNextHandReal(DeckStack *deckStackPointer, BlackJackPlaye
                             simpleStack.cardsLeft--;
 
                             thirdCard.cardID = k;
-                            addCardToPlayerDynamicMemory(&blackJackDealerPointer->player, thirdCard);
+                            addCardToPlayerStaticMemory(&blackJackDealerPointer->player, thirdCard);
                             updatePlayersScore(blackJackDealerPointer);
 
-                            // Dealt first 3 cards
+                            float setupCumulativeWin = 0;
+                            float setupCumulativeLose = 0;
+
+                            /// Dealt first 3 cards
 
 
-                            //TODO Check if hit or stand, when stand work out probability of win lose and draw. If hit we must then simulate once for every card the player could recieve. If stand we must find percentage of win draw and loss
+                            currentChances = shouldStand(deckStackPointer, &simpleStack,
+                                                         probabilityTreePointer,
+                                                         blackJackPlayerPointer,
+                                                         blackJackDealerPointer);
 
+                            if (currentChances.shouldStand == 0) { //If you should hit at least once
+                                int timesHit = 1;
+                                int *hitCards = NULL;
+                                int correctOrder;
+                                int differentCards;
 
-                            // Un-deal cards
+                                float weightFraction;
 
-                            removeCardFromBlackJackPlayersHand(blackJackDealerPointer, blackJackDealerPointer->player.cardsInHand - 1, 1);
+                                while () {//TODO work out contents so that every path is exhausted
+                                    hitCards = realloc(hitCards, timesHit * sizeof(int));
+                                    correctOrder = 1;
+
+                                    while (!nBitCounterAddOne(timesHit, hitCards, 10)) {
+                                        //Deal next card (in every way possible)
+
+                                        //card IDs are values - 1 of hitCards contents
+                                        //hitCards[0] + 1 is the cardID of the 1st hit card
+
+                                        for (int cardPosition = 0; cardPosition < timesHit - 1; cardPosition++) {
+                                            if (hitCards[cardPosition] > hitCards[cardPosition + 1]) {
+                                                correctOrder = 0;
+                                            }
+                                        }
+
+                                        if (correctOrder) {
+                                            //Valid order to deal cards
+
+                                            int enoughOfAllCardsToDeal = 1;
+
+                                            //TODO chance enough of all cards to deal to be 0 if there is not enough of a certain card to deal that possibility
+
+                                            if (enoughOfAllCardsToDeal) {
+                                                //Deal the hits cards
+                                                currentChances = shouldStand(deckStackPointer, &simpleStack,
+                                                                             probabilityTreePointer,
+                                                                             blackJackPlayerPointer,
+                                                                             blackJackDealerPointer);
+                                                //Undeal the hits cards
+
+                                                if (currentChances.shouldStand == 1) {
+
+                                                    for (int cardType = ACE; cardType <= TEN; cardType++) {
+                                                        for (int cardPosition = 0;
+                                                             cardPosition < timesHit; cardPosition++) {
+                                                            if (hitCards[cardPosition] == cardType) {
+                                                                differentCards++;
+                                                                break;
+                                                            }
+                                                        }
+                                                    }
+
+                                                    weightFraction = factorial(differentCards) * waysToGetTheseCards * 10^hits;
+
+                                                    setupCumulativeWin = currentChances.currentCumulativeLose * weightFraction;
+                                                    setupCumulativeLose = currentChances.currentCumulativeLose * weightFraction;
+
+                                                    if (hitCards[timesHit - 1] == TEN) {
+                                                        //Go up a level
+                                                        timesHit--;
+                                                        break;
+                                                    }
+
+                                                } else {
+                                                    //Go deeper
+                                                    timesHit++;
+                                                    break;
+                                                }
+
+                                            }
+                                        }
+
+                                    }
+                                }
+                            } else {
+                                setupCumulativeWin = currentChances.currentCumulativeWin;
+                                setupCumulativeLose = currentChances.currentCumulativeLose;
+                            }
+
+                            float chanceOfGettingFirst3Cards = (weight / totalStartingHands);
+                            totalWin +=  chanceOfGettingFirst3Cards * setupCumulativeWin;
+                            totalLose += chanceOfGettingFirst3Cards * setupCumulativeLose;
+
+                            /// Un-deal first 3 cards
+
+                            removeCardFromBlackJackPlayersHand(blackJackDealerPointer,
+                                                               blackJackDealerPointer->player.cardsInHand - 1, 1);
 
                             simpleStack.cardsCountsInStack[k]++;
                             weight /= simpleStack.cardsCountsInStack[k];
@@ -414,19 +518,22 @@ float getExpectedValueOfNextHandReal(DeckStack *deckStackPointer, BlackJackPlaye
                         }
                     }
 
-                    removeCardFromBlackJackPlayersHand(blackJackPlayerPointer, blackJackPlayerPointer->player.cardsInHand - 1, 1);
+                    removeCardFromBlackJackPlayersHand(blackJackPlayerPointer,
+                                                       blackJackPlayerPointer->player.cardsInHand - 1, 1);
 
                     simpleStack.cardsCountsInStack[j]++;
                     weight /= simpleStack.cardsCountsInStack[j];
                     simpleStack.cardsLeft++;
 
                     if (i != j) {
+                        //Only do in ascending order, total ways to organise is factorial of different cards
                         weight /= 2; //Corrects weights for occurrences that can happen in 2 ways
                     }
                 }
             }
 
-            removeCardFromBlackJackPlayersHand(blackJackPlayerPointer, blackJackPlayerPointer->player.cardsInHand - 1, 1);
+            removeCardFromBlackJackPlayersHand(blackJackPlayerPointer, blackJackPlayerPointer->player.cardsInHand - 1,
+                                               1);
 
             simpleStack.cardsCountsInStack[i]++;
             weight /= simpleStack.cardsCountsInStack[i];
@@ -434,8 +541,40 @@ float getExpectedValueOfNextHandReal(DeckStack *deckStackPointer, BlackJackPlaye
         }
     }
 
-    int totalHands =
-            deckStackPointer->cardsLeft * (deckStackPointer->cardsLeft - 1) * (deckStackPointer->cardsLeft - 2);
+    return 0;
+}
 
-    return (totalWin - totalLose) / totalHands;
+/**
+ * Counter function that takes bits in a counter, pointer to the counter and base of counting and then returns 1 if the counter has finished and if not returns 0 and increments the counter by 1
+ *
+ * @param bits      Bits in the counter
+ * @param p         Pointer to counter
+ * @param base      Base of counting
+ * @return          If the counter has finished
+ */
+int nBitCounterAddOne(int bits, int *p, int base) {
+    int finished = 1;
+    for (int i = 0; i < bits; i++) {
+        if (p[i] < base - 1) {
+            finished = 0;
+            break;
+        }
+    }
+
+    if (finished) {
+        return finished;
+    }
+
+    p[0] = p[0] + 1;
+
+    for (int i = 0; i < bits; i++) {
+        if (p[i] >= base) {
+            if (i < bits - 1 && p[i + 1] < base) {
+                p[i + 1] = p[i + 1] + 1;
+                p[i] = 0;
+            }
+        }
+    }
+
+    return 0;
 }
