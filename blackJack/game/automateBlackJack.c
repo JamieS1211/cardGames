@@ -78,7 +78,6 @@ void automateBlackJack(int gamesSets, int gamesPerSet, float startBalance, float
                 }
 
 
-                int test = getExpectedValueOfNextHand(&deckStack, &probabilityTree, &player, &dealer);
                 float bet = standardBetExpectedValue(getTrueCount(&deckStack), minBet, maxBet);
 
                 dealBlackJack(&deckStack, &simpleDeckStack, &player, 1);
@@ -90,7 +89,7 @@ void automateBlackJack(int gamesSets, int gamesPerSet, float startBalance, float
 
                 while (!playerBust && !doesPlayerHaveBlackJack(&player)) {
 
-                    if (shouldStand(&deckStack, &simpleDeckStack, &probabilityTree, &player, &dealer).shouldStand) {
+                    if (shouldStand(&deckStack, &simpleDeckStack, &probabilityTree, &player, &dealer)) {
                         break;
                     } else {
                         dealBlackJack(&deckStack, &simpleDeckStack, &player, 1);

@@ -28,10 +28,4 @@ typedef struct probabilityTree {
     Probability **tree;
 } ProbabilityTree;
 
-typedef struct currentChances {
-    int shouldStand;
-    float currentCumulativeWin;
-    float currentCumulativeLose;
-} CurrentChances;
-
 #endif //BLACKJACK_BLACKJACKAPI_BLACKJACK_H

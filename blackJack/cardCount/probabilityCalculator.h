@@ -14,12 +14,12 @@
 void calculateProbabilities(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer);
 
 /**
- * A function that returns a current chances object that advises if a player should stand and what their current win and lose chances are
+ * A function that returns 1 if should stand and 0 if should hit
  * @param deckStackPointer
  * @param blackJackPlayerPointer
  * @param blackJackDealerPointer
  */
-CurrentChances shouldStand(DeckStack *deckStackPointer, SimpleStack *simpleStackPointer, ProbabilityTree *probabilityTreePointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer);
+int shouldStand(DeckStack *deckStackPointer, SimpleStack *simpleStackPointer, ProbabilityTree *probabilityTreePointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer);
 
 /**
  * A function that returns the expected value of the next hand
@@ -29,16 +29,8 @@ CurrentChances shouldStand(DeckStack *deckStackPointer, SimpleStack *simpleStack
 float getTrueCount(DeckStack *deckStackPointer);
 
 
-float getExpectedValueOfNextHand(DeckStack *deckStackPointer, ProbabilityTree *probabilityTreePointer, BlackJackPlayer *blackJackPlayerPointer, BlackJackPlayer *blackJackDealerPointer);
+float getExpectedValueOfNextHandReal(DeckStack *deckStackPointer, BlackJackPlayer *blackJackPlayerPointer,
+                                     BlackJackPlayer *blackJackDealerPointer);
 
-/**
- * Counter function that takes bits in a counter, pointer to the counter and base of counting and then returns 1 if the counter has finished and if not returns 0 and increments the counter by 1
- *
- * @param bits      Bits in the counter
- * @param p         Pointer to counter
- * @param base      Base of counting
- * @return          If the counter has finished
- */
-int nBitCounterAddOne(int bits, int *p, int base);
 
 #endif //BLACKJACK_CARDCOUNT_PROBABILITYCALCULATOR_H
