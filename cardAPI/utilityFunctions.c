@@ -117,7 +117,7 @@ Card dealCardStaticMemory(DeckStack *stackPointer, Player *playerPointer) {
     Card card = getCardFromDeckStack(stackPointer, cardPosition);
     removeCardFromDeckStack(stackPointer, cardPosition);
 
-    addCardToPlayerDynamicMemory(playerPointer, card);
+    addCardToPlayerStaticMemory(playerPointer, card);
 
     return card;
 }

@@ -8,7 +8,6 @@
 #include "../../cardAPI/api.h"
 
 #define DECKSUSED 1
-#define LAYERSTOCALCULATE 2
 #define POSSIBLESCORES 23
 
 typedef struct blackJackPlayer {

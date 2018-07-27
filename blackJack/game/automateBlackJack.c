@@ -29,12 +29,14 @@ void automateBlackJack(int gamesSets, int gamesPerSet, float startBalance, float
     float percentRemainingForShuffle = 20;
     int cardShuffleThreshold = (DECKSUSED * NUMBER_OF_SUITS * NUMBER_OF_CARDS) * percentRemainingForShuffle / 100;
 
+    int localLayersToCalculate = maxLayersDeepForScore(21);
+
     ProbabilityTree probabilityTree;
 
     probabilityTree.tree = NULL;
-    probabilityTree.tree = malloc(LAYERSTOCALCULATE * POSSIBLESCORES * sizeof(Probability));
+    probabilityTree.tree = malloc(localLayersToCalculate * POSSIBLESCORES * sizeof(Probability));
 
-    for (int layer = 0; layer < LAYERSTOCALCULATE; layer++) {
+    for (int layer = 0; layer < localLayersToCalculate; layer++) {
         probabilityTree.tree[layer] = malloc(POSSIBLESCORES * sizeof(Probability));
     }
 
@@ -165,7 +167,7 @@ void automateBlackJack(int gamesSets, int gamesPerSet, float startBalance, float
 
     printf("\n\n");
 
-    for (int layer = 0; layer < LAYERSTOCALCULATE; layer++) {
+    for (int layer = 0; layer < localLayersToCalculate; layer++) {
         free(probabilityTree.tree[layer]);
     }
     free(probabilityTree.tree);

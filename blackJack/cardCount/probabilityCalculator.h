@@ -33,4 +33,8 @@ float getExpectedValueOfNextHandReal(DeckStack *deckStackPointer, BlackJackPlaye
                                      BlackJackPlayer *blackJackDealerPointer);
 
 
+int factorial(int i);
+
+int maxLayersDeepForScore(int score);
+
 #endif //BLACKJACK_CARDCOUNT_PROBABILITYCALCULATOR_H

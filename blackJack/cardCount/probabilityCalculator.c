@@ -12,11 +12,13 @@
 
 void printProbabilities(Probability **treePointer) {
 
-    float cumulativeWin[LAYERSTOCALCULATE];
-    float cumulativeDraw[LAYERSTOCALCULATE];
-    float cumulativeLose[LAYERSTOCALCULATE];
+    int localLayersToCalculate = maxLayersDeepForScore(21);
 
-    for (int layer = 0; layer < LAYERSTOCALCULATE; layer++) {
+    float cumulativeWin[localLayersToCalculate];
+    float cumulativeDraw[localLayersToCalculate];
+    float cumulativeLose[localLayersToCalculate];
+
+    for (int layer = 0; layer < localLayersToCalculate; layer++) {
         int totalWays = 0;
 
         cumulativeWin[layer] = 0;
@@ -30,7 +32,7 @@ void printProbabilities(Probability **treePointer) {
 
         printf("\nLayer: %i \n", layer);
 
-        printf("\t\t\t\t Chance");
+        printf("\t\t\t Chance");
         printf("\t\t\t Win");
         printf("\t\t\t Draw");
         printf("\t\t\t Lose \n");
@@ -73,7 +75,11 @@ void printProbabilities(Probability **treePointer) {
         cumulativeDraw[layer] /= 100;
         cumulativeLose[layer] /= 100;
 
-        printf("\nCumulative probability:\t\t\t %f%%\t\t %f%%\t\t %f%% \n", cumulativeWin[layer], cumulativeDraw[layer], cumulativeLose[layer]);
+        printf("\nCumulative probability:\t\t\t\t %f%%\t\t %f%%\t\t %f%% \n", cumulativeWin[layer], cumulativeDraw[layer], cumulativeLose[layer]);
+
+        if (cumulativeLose[layer] == 100) {
+            break;
+        }
     }
 }
 
@@ -172,6 +178,8 @@ void calculateProbabilities(DeckStack *deckStackPointer, BlackJackPlayer *blackJ
     SimpleStack simpleStack;
     initialiseSimpleStackFromDeckStack(&simpleStack, deckStackPointer);
 
+    int localLayersToCalculate = maxLayersDeepForScore(21);
+
     // Simplify all 10 score cards into one slot
     for (int i = JACK; i <= KING; i++) {
         while (simpleStack.cardsCountsInStack[i] > 0) {
@@ -182,14 +190,14 @@ void calculateProbabilities(DeckStack *deckStackPointer, BlackJackPlayer *blackJ
 
     Probability **tree = NULL;
 
-    tree = malloc(LAYERSTOCALCULATE * POSSIBLESCORES * sizeof(Probability));
+    tree = malloc(localLayersToCalculate * POSSIBLESCORES * sizeof(Probability));
 
-    for (int layer = 0; layer < LAYERSTOCALCULATE; layer++) {
+    for (int layer = 0; layer < localLayersToCalculate; layer++) {
         tree[layer] = malloc(POSSIBLESCORES * sizeof(Probability));
     }
 
 
-    for (int layer = 0; layer < LAYERSTOCALCULATE; layer++) {
+    for (int layer = 0; layer < localLayersToCalculate; layer++) {
         for (int score = 0; score < POSSIBLESCORES; score++) {
             tree[layer][score].waysToAchieveScore = 0;
             tree[layer][score].waysWithScoreToWin = 0;
@@ -198,12 +206,12 @@ void calculateProbabilities(DeckStack *deckStackPointer, BlackJackPlayer *blackJ
         }
     }
 
-    calculatePlayerHitScores(&simpleStack, blackJackPlayerPointer, blackJackDealerPointer, tree, 0, 1, LAYERSTOCALCULATE);
+    calculatePlayerHitScores(&simpleStack, blackJackPlayerPointer, blackJackDealerPointer, tree, 0, 1, localLayersToCalculate);
     updatePlayersScore(blackJackPlayerPointer);
     updatePlayersScore(blackJackDealerPointer);
 
     printProbabilities(tree);
-    for (int layer = 0; layer < LAYERSTOCALCULATE; layer++) {
+    for (int layer = 0; layer < localLayersToCalculate; layer++) {
         free(tree[layer]);
     }
     free(tree);
@@ -368,7 +376,7 @@ float getExpectedValueOfNextHandReal(DeckStack *deckStackPointer, BlackJackPlaye
             simpleStack.cardsLeft--;
 
             firstCard.cardID = i;
-            addCardToPlayerDynamicMemory(&blackJackPlayerPointer->player, firstCard);
+            addCardToPlayerStaticMemory(&blackJackPlayerPointer->player, firstCard);
 
             for (int j = i; j < 10; j++) {
                 // Deal 2nd card to player
@@ -378,7 +386,7 @@ float getExpectedValueOfNextHandReal(DeckStack *deckStackPointer, BlackJackPlaye
                     simpleStack.cardsLeft--;
 
                     secondCard.cardID = j;
-                    addCardToPlayerDynamicMemory(&blackJackPlayerPointer->player, secondCard);
+                    addCardToPlayerStaticMemory(&blackJackPlayerPointer->player, secondCard);
 
                     if (i != j) {
                         weight *= 2; //Corrects weights for occurrences that can happen in 2 ways
@@ -395,7 +403,7 @@ float getExpectedValueOfNextHandReal(DeckStack *deckStackPointer, BlackJackPlaye
                             simpleStack.cardsLeft--;
 
                             thirdCard.cardID = k;
-                            addCardToPlayerDynamicMemory(&blackJackDealerPointer->player, thirdCard);
+                            addCardToPlayerStaticMemory(&blackJackDealerPointer->player, thirdCard);
                             updatePlayersScore(blackJackDealerPointer);
 
                             // Dealt first 3 cards
@@ -438,4 +446,30 @@ float getExpectedValueOfNextHandReal(DeckStack *deckStackPointer, BlackJackPlaye
             deckStackPointer->cardsLeft * (deckStackPointer->cardsLeft - 1) * (deckStackPointer->cardsLeft - 2);
 
     return (totalWin - totalLose) / totalHands;
+}
+
+int factorial(int i) {
+    if (i > 1) {
+        return i * factorial(i - 1);
+    } else if (i == 1) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+int maxLayersDeepForScore(int score) {
+    int maxLayers = 0;
+    for (int cardID = ACE; cardID <= KING; cardID++) {
+        for (int i = 0; i < DECKSUSED * NUMBER_OF_SUITS; i++) {
+            if (score < 0) {
+                return maxLayers;
+            } else {
+                score -= cardID;
+                maxLayers++;
+            }
+        }
+    }
+
+    return maxLayers;
 }
