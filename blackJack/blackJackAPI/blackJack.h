@@ -7,6 +7,8 @@
 
 #include "../../cardAPI/api.h"
 
+#define PRINTOPTION 0
+
 #define DECKSUSED 1
 #define POSSIBLESCORES 23
 
@@ -18,9 +20,10 @@ typedef struct blackJackPlayer {
 
 typedef struct probability {
     unsigned long long waysToAchieveScore;
-    unsigned long long waysWithScoreToWin;
-    unsigned long long waysWithScoreToDraw;
-    unsigned long long waysWithScoreToLoose;
+    float unscaledProbabilityWithScoreToWin;
+    float unscaledProbabilityWithScoreToDraw;
+    float unscaledProbabilityWithScoreToLoose;
+    int waysToGetHere;
 } Probability;
 
 typedef struct probabilityTree {
